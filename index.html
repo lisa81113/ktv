@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>行動KTV 🎤</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #FFD700;
+  --gold-dark: #B8860B;
+  --bg-dark: #0d0500;
+  --bg-mid: #1e0c00;
+  --bg-card: #2d1500;
+  --text-bright: #fff8e7;
+  --text-dim: #c8a96e;
+  --accent: #ff6b35;
+  --lyric-size: 2.4rem;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-bright);
+  min-height: 100vh;
+  overflow-x: hidden;
+  user-select: none;
+}
+.header {
+  background: linear-gradient(135deg, #2d0a00, #5a1a00);
+  border-bottom: 3px solid var(--gold);
+  padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 200;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+}
+.header-title { font-size: 1.7rem; font-weight: 900; color: var(--gold); letter-spacing: 2px; }
+.header-title span { color: var(--accent); }
+.header-sub { font-size: 0.8rem; color: var(--text-dim); }
+.nav-tabs {
+  display: flex; background: var(--bg-mid);
+  border-bottom: 2px solid var(--gold-dark);
+  position: sticky; top: 56px; z-index: 100;
+}
+.nav-tab {
+  flex: 1; padding: 13px 6px; text-align: center;
+  font-size: 0.95rem; font-weight: 700; color: var(--text-dim);
+  cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s;
+}
+.nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); background: rgba(255,215,0,0.07); }
+.panel { display: none; padding: 14px 14px 80px; }
+.panel.active { display: block; }
+
+/* YouTube */
+.yt-wrapper {
+  position: relative; width: 100%; padding-top: 56.25%;
+  background: #000; border-radius: 14px; overflow: hidden;
+  border: 3px solid var(--gold-dark); margin-bottom: 12px;
+  box-shadow: 0 0 30px rgba(255,215,0,0.15);
+}
+.yt-wrapper iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:none; }
+.yt-idle {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at center, #1a0030 0%, #000 70%);
+  color: var(--text-dim); gap: 10px;
+}
+.yt-idle .big-icon { font-size: 4rem; }
+.yt-idle .big-text { font-size: 1.1rem; }
+.yt-idle .sm-text { font-size: 0.85rem; margin-top: 4px; }
+
+/* Lyric */
+.lyric-bar {
+  background: linear-gradient(135deg, #1a0800, #2d1200);
+  border: 2px solid var(--gold-dark); border-radius: 14px;
+  padding: 16px 14px; margin-bottom: 12px;
+  min-height: 120px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+}
+.lyric-idle { color: var(--text-dim); font-size: 1.1rem; }
+.lyric-prev-text { font-size: calc(var(--lyric-size)*0.55); color: rgba(255,255,255,0.28); margin-bottom:6px; min-height:1.4em; }
+.lyric-curr-text {
+  font-size: var(--lyric-size); font-weight: 900; color: var(--gold);
+  text-shadow: 0 0 25px rgba(255,215,0,0.7), 0 2px 6px rgba(0,0,0,0.9);
+  letter-spacing: 3px; line-height: 1.3; margin-bottom: 6px; min-height: 1.4em;
+}
+.lyric-next-text { font-size: calc(var(--lyric-size)*0.55); color: rgba(255,255,255,0.28); min-height:1.4em; }
+
+/* Progress */
+.progress-row {
+  background: var(--bg-card); border: 1px solid var(--gold-dark);
+  border-radius: 12px; padding: 10px 14px; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.progress-bar-wrap {
+  flex: 1; height: 10px; background: rgba(255,255,255,0.08);
+  border-radius: 5px; overflow: hidden; cursor: pointer;
+}
+.progress-bar-fill {
+  height: 100%; background: linear-gradient(90deg, var(--gold), var(--accent));
+  border-radius: 5px; transition: width 0.5s linear;
+}
+.progress-time { font-size: 0.85rem; color: var(--text-dim); min-width: 34px; text-align: right; }
+
+/* Now Playing */
+.now-playing {
+  background: var(--bg-card); border: 1px solid var(--gold-dark);
+  border-radius: 14px; padding: 12px 14px;
+  display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+}
+.np-disc {
+  width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
+  background: conic-gradient(var(--gold) 0%, #ff6b35 40%, #b8860b 70%, var(--gold) 100%);
+  display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+  animation: spin 3s linear infinite; animation-play-state: paused;
+}
+.np-disc.spin { animation-play-state: running; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.np-info { flex: 1; min-width: 0; }
+.np-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.np-artist { font-size: 0.9rem; color: var(--text-dim); }
+
+/* Controls */
+.controls { display: grid; grid-template-columns: 1fr 1.4fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.ctrl-btn {
+  padding: 14px 8px; border: none; border-radius: 12px; cursor: pointer;
+  font-family: inherit; font-weight: 700;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-size: 0.82rem; transition: all 0.15s;
+}
+.ctrl-btn:active { transform: scale(0.92); }
+.ctrl-btn .ci { font-size: 1.5rem; }
+.c-prev,.c-next { background: var(--bg-card); border: 1px solid var(--gold-dark); color: var(--gold); }
+.c-play { background: linear-gradient(135deg, var(--gold), #d4a000); color: #1a0a00; }
+.c-stop { background: linear-gradient(135deg, #8b0000, #c0392b); color: #fff; }
+
+/* Options */
+.option-row { background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+.option-label { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 8px; }
+.option-btns { display: flex; gap: 7px; flex-wrap: wrap; }
+.opt-btn {
+  padding: 9px 14px; border-radius: 9px; cursor: pointer;
+  border: 2px solid var(--gold-dark); background: transparent;
+  color: var(--gold); font-family: inherit; font-size: 0.95rem; font-weight: 700;
+}
+.opt-btn.active { background: var(--gold); color: #1a0a00; border-color: var(--gold); }
+.opt-btn:active { opacity: 0.7; }
+
+/* Volume */
+.vol-wrap { padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 12px; margin-bottom: 10px; }
+.vol-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.vol-title { font-size: 0.9rem; color: var(--text-dim); }
+.vol-num { font-size: 1.1rem; font-weight: 700; color: var(--gold); }
+.vol-slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.vol-icon { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 34px; }
+.vol-icon .vi { font-size: 1.2rem; }
+.vol-icon .vl { font-size: 0.72rem; color: var(--text-dim); font-weight: 700; }
+input[type=range] {
+  flex: 1; height: 10px; -webkit-appearance: none; appearance: none;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold) var(--val,80%), rgba(255,255,255,0.1) var(--val,80%));
+  border-radius: 5px; outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--gold); cursor: pointer; box-shadow: 0 0 8px rgba(255,215,0,0.5);
+}
+.vol-presets { display: flex; gap: 7px; }
+.vp-btn {
+  flex: 1; padding: 9px 6px; border-radius: 9px;
+  border: 2px solid var(--gold-dark); background: transparent; color: var(--text-dim);
+  font-family: inherit; font-size: 0.82rem; font-weight: 700; cursor: pointer; text-align: center;
+}
+.vp-btn:active { background: var(--gold); color: #1a0a00; border-color: var(--gold); }
+
+/* Search */
+.search-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.search-input {
+  flex: 1; padding: 13px 14px; font-size: 1.05rem;
+  font-family: inherit; background: var(--bg-card); border: 2px solid var(--gold-dark);
+  border-radius: 11px; color: var(--text-bright); outline: none;
+}
+.search-input:focus { border-color: var(--gold); }
+.search-input::placeholder { color: var(--text-dim); }
+.btn-gold {
+  padding: 13px 18px; font-size: 1rem; font-family: inherit; font-weight: 700;
+  background: linear-gradient(135deg, var(--gold), #d4a000); color: #1a0a00;
+  border: none; border-radius: 11px; cursor: pointer;
+}
+.btn-red { padding: 8px 14px; background: linear-gradient(135deg,#8b0000,#c0392b); color:#fff; border:none; border-radius:9px; cursor:pointer; font-family:inherit; font-size:0.88rem; font-weight:700; }
+
+/* Chips */
+.chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
+.chip { padding: 8px 14px; background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 20px; font-size: 0.9rem; color: var(--text-dim); cursor: pointer; transition: all 0.2s; }
+.chip.active { background: var(--gold); color: #1a0a00; border-color: var(--gold); font-weight: 700; }
+
+/* Song list */
+.sec-title { font-size: 1rem; font-weight: 700; color: var(--gold); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.sec-title::after { content:''; flex:1; height:1px; background: var(--gold-dark); }
+.song-list { display: flex; flex-direction: column; gap: 9px; }
+.song-item { background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 13px; padding: 13px 12px; display: flex; align-items: center; gap: 10px; }
+.song-item.playing { border-color: var(--gold); background: rgba(255,215,0,0.07); box-shadow: 0 0 12px rgba(255,215,0,0.15); }
+.song-num { font-size: 0.9rem; color: var(--text-dim); min-width: 24px; text-align: center; font-weight: 700; }
+.song-info { flex: 1; min-width: 0; cursor: pointer; }
+.song-name { font-size: 1.1rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.song-artist { font-size: 0.88rem; color: var(--text-dim); margin-top: 2px; }
+.song-acts { display: flex; gap: 7px; flex-shrink: 0; }
+.ico-btn { width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
+.ico-btn:active { transform: scale(0.88); }
+.ib-fav { background: rgba(255,80,80,0.12); color: #ff6666; }
+.ib-fav.on { background: rgba(255,80,80,0.28); color: #ff2222; }
+.ib-add { background: rgba(255,165,0,0.12); color: #ffa500; }
+.ib-play { background: rgba(255,215,0,0.12); color: var(--gold); }
+
+/* Queue */
+.queue-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.queue-title { font-size: 1rem; font-weight: 700; color: var(--gold); }
+.q-item { background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 11px; padding: 11px 12px; display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+.q-num { width:27px; height:27px; background:var(--gold); color:#1a0a00; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:0.82rem; flex-shrink:0; }
+
+.empty-st { text-align: center; padding: 36px 16px; color: var(--text-dim); font-size: 1rem; }
+.empty-st .ei { font-size: 2.8rem; display: block; margin-bottom: 8px; }
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: rgba(255,215,0,0.96); color: #1a0a00;
+  padding: 11px 22px; border-radius: 28px; font-size: 1rem; font-weight: 700;
+  opacity: 0; transition: all 0.25s; z-index: 999; white-space: nowrap; pointer-events: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<div class="header">
+  <div class="header-title">🎤 行動<span>KTV</span></div>
+  <div class="header-sub">老人家專用版</div>
+</div>
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="goTab('play')">🎵 唱歌</div>
+  <div class="nav-tab" onclick="goTab('search')">🔍 搜尋</div>
+  <div class="nav-tab" onclick="goTab('fav')">❤️ 最愛</div>
+  <div class="nav-tab" onclick="goTab('queue')">📋 點歌</div>
+</div>
+
+<!-- ═══ 唱歌 ═══ -->
+<div class="panel active" id="panel-play">
+
+  <div class="yt-wrapper" id="yt-wrapper">
+    <div class="yt-idle" id="yt-idle">
+      <span class="big-icon">🎤</span>
+      <span class="big-text">請選歌開始演唱</span>
+      <span class="sm-text">搜尋歌曲 → 按 ▶ 立即播放</span>
+    </div>
+    <div id="yt-container" style="display:none;position:absolute;inset:0;"></div>
+  </div>
+
+  <div class="lyric-bar">
+    <div id="lyric-idle" class="lyric-idle">🎵 歌詞會在這裡顯示</div>
+    <div id="lyric-live" style="display:none;width:100%;text-align:center;">
+      <div class="lyric-prev-text" id="l-prev"></div>
+      <div class="lyric-curr-text" id="l-curr"></div>
+      <div class="lyric-next-text" id="l-next"></div>
+    </div>
+  </div>
+
+  <div class="progress-row">
+    <span class="progress-time" id="p-curr">0:00</span>
+    <div class="progress-bar-wrap" onclick="seekClick(event,this)">
+      <div class="progress-bar-fill" id="p-fill" style="width:0%"></div>
+    </div>
+    <span class="progress-time" id="p-total">0:00</span>
+  </div>
+
+  <div class="now-playing" id="now-playing" style="display:none">
+    <div class="np-disc" id="np-disc">🎵</div>
+    <div class="np-info">
+      <div class="np-title" id="np-title">—</div>
+      <div class="np-artist" id="np-artist">—</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn c-prev" onclick="doPrev()"><span class="ci">⏮</span>上一首</button>
+    <button class="ctrl-btn c-play" id="playbtn" onclick="doPlayPause()"><span class="ci" id="play-ic">▶</span><span id="play-lb">播放</span></button>
+    <button class="ctrl-btn c-next" onclick="doNext()"><span class="ci">⏭</span>下一首</button>
+    <button class="ctrl-btn c-stop" onclick="doStop()"><span class="ci">⏹</span>停止</button>
+  </div>
+
+  <div class="option-row">
+    <div class="option-label">🔤 歌詞字體大小</div>
+    <div class="option-btns">
+      <button class="opt-btn" onclick="setFont('small')">小</button>
+      <button class="opt-btn active" onclick="setFont('med')">中</button>
+      <button class="opt-btn" onclick="setFont('large')">大</button>
+      <button class="opt-btn" onclick="setFont('xl')">特大</button>
+    </div>
+  </div>
+
+  <div class="vol-wrap">
+    <div class="vol-top">
+      <span class="vol-title">🔊 音量調整</span>
+      <span class="vol-num" id="vol-num">80</span>
+    </div>
+    <div class="vol-slider-row">
+      <div class="vol-icon"><span class="vi">🔈</span><span class="vl">小</span></div>
+      <input type="range" id="vol-slider" min="0" max="100" value="80" style="--val:80%" oninput="setVol(this.value)">
+      <div class="vol-icon"><span class="vi">🔊</span><span class="vl">大</span></div>
+    </div>
+    <div class="vol-presets">
+      <button class="vp-btn" onclick="setVol(20)">🔈 小聲</button>
+      <button class="vp-btn" onclick="setVol(50)">🔉 中等</button>
+      <button class="vp-btn" onclick="setVol(80)">🔊 大聲</button>
+      <button class="vp-btn" onclick="setVol(100)">📢 最大</button>
+    </div>
+  </div>
+
+  <div class="queue-hdr" style="margin-top:4px;">
+    <div class="queue-title">📋 待唱歌單</div>
+    <button class="btn-gold" onclick="goTab('queue')" style="padding:8px 14px;font-size:0.88rem;">查看全部</button>
+  </div>
+  <div id="queue-preview"></div>
+</div>
+
+<!-- ═══ 搜尋 ═══ -->
+<div class="panel" id="panel-search">
+  <div class="sec-title">🔍 輸入歌名或歌手</div>
+  <div class="search-row">
+    <input type="text" class="search-input" id="s-input" placeholder="歌名 / 歌手名稱..." oninput="doSearch()">
+    <button class="btn-gold" onclick="doSearch()">搜尋</button>
+  </div>
+  <div class="sec-title">🎤 熱門歌手</div>
+  <div class="chips" id="artist-chips"></div>
+  <div class="sec-title">🎵 歌曲列表</div>
+  <div class="song-list" id="s-results"></div>
+</div>
+
+<!-- ═══ 最愛 ═══ -->
+<div class="panel" id="panel-fav">
+  <div class="sec-title">❤️ 我的最愛歌單</div>
+  <div class="song-list" id="fav-list"></div>
+</div>
+
+<!-- ═══ 點歌 ═══ -->
+<div class="panel" id="panel-queue">
+  <div class="queue-hdr">
+    <div class="queue-title">📋 點歌列表</div>
+    <button class="btn-red" onclick="clearQ()">清空全部</button>
+  </div>
+  <div id="q-list"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// 歌曲資料庫（含YouTube伴唱帶ID + 對時歌詞）
+// ══════════════════════════════════════
+const SONGS = [
+  {
+    id:1, name:'愛拼才會贏', artist:'葉啟田', lang:'台語', ytId:'y12_ecvVJgA',
+    lyrics:[
+      {t:28,txt:'一時失志不免怨嘆'},{t:34,txt:'一時落魄不免膽寒'},
+      {t:40,txt:'那通失去希望'},{t:43,txt:'每日醉茫茫'},
+      {t:46,txt:'無魂有體親像稻草人'},{t:52,txt:'人生可比是海上的波浪'},
+      {t:57,txt:'有時起有時落'},{t:63,txt:'好運歹運 總嘛要照起工來行'},
+      {t:72,txt:'三分天注定'},{t:77,txt:'七分靠打拼'},{t:82,txt:'愛拼才會贏 ✨'},
+      {t:94,txt:'一時失志不免怨嘆'},{t:100,txt:'一時落魄不免膽寒'},
+      {t:106,txt:'那通失去希望'},{t:109,txt:'每日醉茫茫'},
+      {t:112,txt:'無魂有體親像稻草人'},{t:117,txt:'人生可比是海上的波浪'},
+      {t:122,txt:'有時起有時落'},{t:128,txt:'好運歹運 總嘛要照起工來行'},
+      {t:137,txt:'三分天注定'},{t:142,txt:'七分靠打拼'},{t:147,txt:'愛拼才會贏 ✨'},
+    ]
+  },
+  {
+    id:2, name:'月亮代表我的心', artist:'鄧麗君', lang:'國語', ytId:'T8ZVKH950DU',
+    lyrics:[
+      {t:8,txt:'你問我愛你有多深'},{t:14,txt:'我愛你有幾分'},
+      {t:20,txt:'我的情也真'},{t:25,txt:'我的愛也真'},
+      {t:30,txt:'月亮代表我的心 🌙'},{t:38,txt:'你問我愛你有多深'},
+      {t:44,txt:'我愛你有幾分'},{t:49,txt:'我的情不移'},
+      {t:54,txt:'我的愛不變'},{t:59,txt:'月亮代表我的心 🌙'},
+      {t:67,txt:'輕輕的一個吻'},{t:73,txt:'已經打動我的心'},
+      {t:79,txt:'深深的一段情'},{t:84,txt:'叫我思念到如今'},
+      {t:91,txt:'你問我愛你有多深'},{t:97,txt:'我愛你有幾分'},
+      {t:102,txt:'你去想一想'},{t:107,txt:'你去看一看'},
+      {t:112,txt:'月亮代表我的心 🌙'},
+    ]
+  },
+  {
+    id:3, name:'甜蜜蜜', artist:'鄧麗君', lang:'國語', ytId:'mMlmjXtnIXI',
+    lyrics:[
+      {t:10,txt:'甜蜜蜜你笑得甜蜜蜜'},{t:16,txt:'好像花兒開在春風裡'},
+      {t:22,txt:'開在春風裡'},{t:28,txt:'在哪裡在哪裡見過你'},
+      {t:34,txt:'你的笑容這樣熟悉'},{t:40,txt:'我一時想不起'},
+      {t:46,txt:'啊～在夢裡'},{t:52,txt:'夢裡夢裡見過你'},
+      {t:58,txt:'甜蜜笑得多甜蜜'},{t:64,txt:'是你是你 夢見的就是你 💕'},
+    ]
+  },
+  {
+    id:4, name:'小城故事', artist:'鄧麗君', lang:'國語', ytId:'7kBIR9mHpJY',
+    lyrics:[
+      {t:8,txt:'小城故事多'},{t:13,txt:'充滿喜和樂'},
+      {t:18,txt:'若是你到小城來'},{t:24,txt:'收穫特別多'},
+      {t:29,txt:'看似一幅畫'},{t:34,txt:'聽像一首歌'},
+      {t:39,txt:'人生境界真善美'},{t:44,txt:'這裡已包括'},
+      {t:50,txt:'談的談說的說'},{t:55,txt:'小城故事真不錯'},
+      {t:60,txt:'請你的朋友一起來'},{t:66,txt:'小城來做客 🏡'},
+    ]
+  },
+  {
+    id:5, name:'何日君再來', artist:'鄧麗君', lang:'國語', ytId:'5r8rMlDFLDk',
+    lyrics:[
+      {t:12,txt:'好花不常開'},{t:18,txt:'好景不常在'},
+      {t:23,txt:'愁堆解笑眉'},{t:29,txt:'淚灑相思帶'},
+      {t:35,txt:'今宵離別後'},{t:40,txt:'何日君再來'},
+      {t:46,txt:'喝完了這杯'},{t:51,txt:'請進點小菜'},
+      {t:57,txt:'人生難得幾回醉'},{t:63,txt:'不歡更何待 🥂'},
+    ]
+  },
+  {
+    id:6, name:'夜來香', artist:'鄧麗君', lang:'國語', ytId:'VkCRzqXhLeo',
+    lyrics:[
+      {t:10,txt:'那南風吹來清涼'},{t:16,txt:'那夜鶯啼聲細唱'},
+      {t:22,txt:'月下的花兒都入夢'},{t:28,txt:'只有那夜來香'},
+      {t:34,txt:'吐露著芬芳'},{t:40,txt:'夜來香'},
+      {t:43,txt:'我為你歌唱'},{t:49,txt:'夜來香 🌺'},
+      {t:52,txt:'我為你思量'},
+    ]
+  },
+  {
+    id:7, name:'港都夜雨', artist:'洪一峰', lang:'台語', ytId:'8F5k4UZgGOo',
+    lyrics:[
+      {t:12,txt:'一個人客倚船邊'},{t:18,txt:'無聊看著海'},
+      {t:23,txt:'想起家中的愛人'},{t:29,txt:'夢裡相見才'},
+      {t:35,txt:'港都的夜雨啊'},{t:40,txt:'你落於誰的心內'},
+      {t:46,txt:'愛人等你的心肝'},{t:52,txt:'不知你知不知'},
+    ]
+  },
+  {
+    id:8, name:'思慕的人', artist:'洪榮宏', lang:'台語', ytId:'KKRTecnAqUk',
+    lyrics:[
+      {t:17,txt:'秋風啊秋雨'},{t:23,txt:'送走了多少的情'},
+      {t:29,txt:'月娘照著孤單的我'},{t:35,txt:'思念著你的容情'},
+      {t:42,txt:'啊～思慕的人'},{t:48,txt:'你到底在哪裡'},
+      {t:54,txt:'等你呀等你啊'},{t:60,txt:'等到心肝碎 💔'},
+    ]
+  },
+  {
+    id:9, name:'黃昏的故鄉', artist:'文夏', lang:'台語', ytId:'JgKBpH4HxAo',
+    lyrics:[
+      {t:10,txt:'每當太陽慢慢落下山'},{t:16,txt:'天色漸漸暗下來'},
+      {t:22,txt:'思念故鄉的情感'},{t:28,txt:'湧上心頭來'},
+      {t:34,txt:'啊～故鄉的青山'},{t:40,txt:'啊～故鄉的綠水'},
+      {t:46,txt:'夢中常看見'},{t:52,txt:'你美麗的面影 🌄'},
+    ]
+  },
+  {
+    id:10, name:'往事只能回味', artist:'尤雅', lang:'國語', ytId:'H3JJREGbXec',
+    lyrics:[
+      {t:10,txt:'時光一逝永不回'},{t:16,txt:'往事只能回味'},
+      {t:22,txt:'憶童年時竹馬青梅'},{t:28,txt:'兩小無猜日月長'},
+      {t:35,txt:'但願那海棠花'},{t:41,txt:'還在寂寞的開著'},
+      {t:47,txt:'等著我讓我再回到'},{t:53,txt:'你溫柔的懷抱裡 🌸'},
+    ]
+  },
+  {
+    id:11, name:'綠島小夜曲', artist:'紫薇', lang:'國語', ytId:'Lm3HxpHagkk',
+    lyrics:[
+      {t:12,txt:'這綠島像一隻船'},{t:18,txt:'在月夜裡搖呀搖'},
+      {t:24,txt:'姑娘呀你也在我心海裡飄'},{t:31,txt:'讓我的歌聲隨那微風'},
+      {t:37,txt:'吹開了你的窗簾'},{t:43,txt:'讓我的衷情'},
+      {t:48,txt:'隨那流水'},{t:53,txt:'不斷的向你傾訴 🏝'},
+    ]
+  },
+  {
+    id:12, name:'浪人情歌', artist:'伍佰', lang:'國語', ytId:'tHs5y_wZFoY',
+    lyrics:[
+      {t:22,txt:'我無法離開你'},{t:28,txt:'就像無法停止呼吸'},
+      {t:34,txt:'雖然你無情無義'},{t:40,txt:'你卻是我唯一'},
+      {t:46,txt:'我的心整個'},{t:51,txt:'都已沉醉在你的懷裡'},
+      {t:57,txt:'寶貝對不起'},{t:62,txt:'是我不好 💕'},
+    ]
+  },
+];
+
+const ARTISTS = ['鄧麗君','洪一峰','葉啟田','伍佰','文夏','洪榮宏','尤雅','紫薇'];
+const FONT_SIZES = {small:'1.5rem',med:'2.4rem',large:'3.2rem',xl:'4rem'};
+
+let queue = [];
+let favs = JSON.parse(localStorage.getItem('ktv3_fav') || '[]');
+let currentSong = null;
+let ytPlayer = null;
+let ytReady = false;
+let progressTimer = null;
+let currentVol = 80;
+
+// YouTube API callback
+function onYouTubeIframeAPIReady() {
+  ytReady = true;
+}
+
+function loadYT(song) {
+  const container = document.getElementById('yt-container');
+  container.innerHTML = '<div id="yt-player"></div>';
+  container.style.display = 'block';
+  document.getElementById('yt-idle').style.display = 'none';
+
+  if (ytPlayer) { try { ytPlayer.destroy(); } catch(e){} ytPlayer = null; }
+
+  ytPlayer = new YT.Player('yt-player', {
+    videoId: song.ytId,
+    playerVars: { autoplay:1, controls:1, rel:0, modestbranding:1, playsinline:1 },
+    events: {
+      onReady(e) {
+        e.target.setVolume(currentVol);
+        e.target.playVideo();
+        document.getElementById('np-disc').classList.add('spin');
+        startProgress();
+        updatePlayBtn(true);
+      },
+      onStateChange(e) {
+        const playing = e.data === YT.PlayerState.PLAYING;
+        document.getElementById('np-disc').classList.toggle('spin', playing);
+        updatePlayBtn(playing);
+        if (e.data === YT.PlayerState.ENDED) {
+          setTimeout(() => { if (queue.length > 0) doNext(); }, 1500);
+        }
+      }
+    }
+  });
+}
+
+function startProgress() {
+  clearInterval(progressTimer);
+  progressTimer = setInterval(() => {
+    if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+    try {
+      const cur = ytPlayer.getCurrentTime() || 0;
+      const dur = ytPlayer.getDuration() || 0;
+      document.getElementById('p-fill').style.width = (dur > 0 ? cur/dur*100 : 0) + '%';
+      document.getElementById('p-curr').textContent = fmtTime(cur);
+      document.getElementById('p-total').textContent = fmtTime(dur);
+      if (currentSong) syncLyric(cur);
+    } catch(e){}
+  }, 400);
+}
+
+function syncLyric(t) {
+  const lyr = currentSong.lyrics;
+  let idx = -1;
+  for (let i = 0; i < lyr.length; i++) {
+    if (t >= lyr[i].t) idx = i; else break;
+  }
+  if (idx < 0) {
+    document.getElementById('lyric-idle').style.display = 'block';
+    document.getElementById('lyric-live').style.display = 'none';
+    document.getElementById('lyric-idle').textContent = '🎵 準備中，歌詞即將顯示...';
+    return;
+  }
+  document.getElementById('lyric-idle').style.display = 'none';
+  document.getElementById('lyric-live').style.display = 'block';
+  document.getElementById('l-prev').textContent = idx > 0 ? lyr[idx-1].txt : '';
+  document.getElementById('l-curr').textContent = lyr[idx].txt;
+  document.getElementById('l-next').textContent = idx < lyr.length-1 ? lyr[idx+1].txt : '';
+}
+
+function fmtTime(s) {
+  s = Math.floor(s||0);
+  return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+}
+
+function seekClick(e, bar) {
+  if (!ytPlayer || typeof ytPlayer.getDuration !== 'function') return;
+  const r = bar.getBoundingClientRect();
+  ytPlayer.seekTo((e.clientX - r.left) / r.width * (ytPlayer.getDuration()||0), true);
+}
+
+function playSong(id) {
+  const song = SONGS.find(s => s.id === id);
+  if (!song) return;
+  currentSong = song;
+  document.getElementById('now-playing').style.display = 'flex';
+  document.getElementById('np-title').textContent = song.name;
+  document.getElementById('np-artist').textContent = song.artist + ' · ' + song.lang;
+  document.getElementById('lyric-idle').style.display = 'block';
+  document.getElementById('lyric-idle').textContent = '🎵 載入中...';
+  document.getElementById('lyric-live').style.display = 'none';
+  document.getElementById('p-fill').style.width = '0%';
+  document.getElementById('p-curr').textContent = '0:00';
+  goTab('play');
+  showToast('▶ 播放：' + song.name);
+  if (!ytReady) {
+    showToast('⚠️ YouTube 載入中，請稍候...');
+    let tries = 0;
+    const wait = setInterval(() => {
+      tries++;
+      if (ytReady) { clearInterval(wait); loadYT(song); }
+      if (tries > 20) clearInterval(wait);
+    }, 500);
+    return;
+  }
+  loadYT(song);
+}
+
+function doPlayPause() {
+  if (!ytPlayer || typeof ytPlayer.getPlayerState !== 'function') {
+    showToast(currentSong ? '播放器載入中...' : '請先選歌！'); return;
+  }
+  const s = ytPlayer.getPlayerState();
+  if (s === YT.PlayerState.PLAYING) ytPlayer.pauseVideo();
+  else ytPlayer.playVideo();
+}
+
+function updatePlayBtn(playing) {
+  document.getElementById('play-ic').textContent = playing ? '⏸' : '▶';
+  document.getElementById('play-lb').textContent = playing ? '暫停' : '播放';
+}
+
+function doStop() {
+  clearInterval(progressTimer);
+  if (ytPlayer && typeof ytPlayer.destroy === 'function') { try { ytPlayer.destroy(); } catch(e){} ytPlayer = null; }
+  document.getElementById('yt-container').style.display = 'none';
+  document.getElementById('yt-container').innerHTML = '';
+  document.getElementById('yt-idle').style.display = 'flex';
+  document.getElementById('now-playing').style.display = 'none';
+  document.getElementById('np-disc').classList.remove('spin');
+  document.getElementById('p-fill').style.width = '0%';
+  document.getElementById('p-curr').textContent = '0:00';
+  document.getElementById('p-total').textContent = '0:00';
+  document.getElementById('lyric-idle').style.display = 'block';
+  document.getElementById('lyric-idle').textContent = '🎵 歌詞會在這裡顯示';
+  document.getElementById('lyric-live').style.display = 'none';
+  updatePlayBtn(false);
+  currentSong = null;
+  showToast('⏹ 已停止');
+}
+
+function doNext() {
+  if (queue.length > 0) { const n = queue.shift(); renderQueue(); playSong(n.id); }
+  else { const i = currentSong ? SONGS.findIndex(s=>s.id===currentSong.id) : -1; playSong(SONGS[(i+1)%SONGS.length].id); }
+}
+function doPrev() {
+  const i = currentSong ? SONGS.findIndex(s=>s.id===currentSong.id) : 0;
+  playSong(SONGS[(i-1+SONGS.length)%SONGS.length].id);
+}
+
+function setVol(v) {
+  v = parseInt(v); currentVol = v;
+  document.getElementById('vol-num').textContent = v;
+  const sl = document.getElementById('vol-slider');
+  sl.value = v; sl.style.setProperty('--val', v+'%');
+  if (ytPlayer && typeof ytPlayer.setVolume === 'function') ytPlayer.setVolume(v);
+}
+
+function setFont(k) {
+  document.documentElement.style.setProperty('--lyric-size', FONT_SIZES[k]);
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>b.classList.toggle('active',['small','med','large','xl'][i]===k));
+}
+
+function addToQueue(id) {
+  const song = SONGS.find(s=>s.id===id);
+  if (!song) return;
+  if (queue.find(s=>s.id===id)) { showToast('已在點歌列表'); return; }
+  queue.push(song); renderQueue();
+  showToast('➕ 已加入：' + song.name);
+}
+function removeQ(i) { queue.splice(i,1); renderQueue(); }
+function clearQ() { queue=[]; renderQueue(); showToast('點歌列表已清空'); }
+
+function toggleFav(id) {
+  if (favs.includes(id)) { favs=favs.filter(f=>f!==id); showToast('移除最愛'); }
+  else { favs.push(id); showToast('❤️ 加入最愛！'); }
+  localStorage.setItem('ktv3_fav', JSON.stringify(favs));
+  renderFav(); doSearch();
+}
+
+function songHTML(s, num) {
+  const fav = favs.includes(s.id), np = currentSong&&currentSong.id===s.id;
+  return `<div class="song-item ${np?'playing':''}">
+    <div class="song-num">${num}</div>
+    <div class="song-info" onclick="playSong(${s.id})">
+      <div class="song-name">${np?'🎵 ':''}${s.name}</div>
+      <div class="song-artist">${s.artist} · ${s.lang}</div>
+    </div>
+    <div class="song-acts">
+      <button class="ico-btn ib-fav ${fav?'on':''}" onclick="toggleFav(${s.id})">${fav?'❤️':'🤍'}</button>
+      <button class="ico-btn ib-add" onclick="addToQueue(${s.id})">➕</button>
+      <button class="ico-btn ib-play" onclick="playSong(${s.id})">▶</button>
+    </div>
+  </div>`;
+}
+
+function renderSearch(songs) {
+  const el = document.getElementById('s-results');
+  el.innerHTML = songs.length ? songs.map((s,i)=>songHTML(s,i+1)).join('') : '<div class="empty-st"><span class="ei">😔</span>找不到歌曲</div>';
+}
+function renderFav() {
+  const el = document.getElementById('fav-list'), list = SONGS.filter(s=>favs.includes(s.id));
+  el.innerHTML = list.length ? list.map((s,i)=>songHTML(s,i+1)).join('') : '<div class="empty-st"><span class="ei">💝</span>還沒有最愛<br>按歌曲旁的愛心加入！</div>';
+}
+function renderQueue() {
+  const el = document.getElementById('q-list'), pre = document.getElementById('queue-preview');
+  if (!queue.length) {
+    el.innerHTML = '<div class="empty-st"><span class="ei">🎶</span>點歌列表是空的</div>';
+    pre.innerHTML = '<div style="color:var(--text-dim);font-size:0.9rem;text-align:center;padding:8px">待唱列表是空的</div>';
+    return;
+  }
+  const qHTML = s => `<div class="q-item">
+    <div class="q-num">${queue.indexOf(s)+1}</div>
+    <div class="song-info" style="flex:1"><div class="song-name">${s.name}</div><div class="song-artist">${s.artist}</div></div>
+    <button class="ico-btn" style="background:rgba(200,0,0,0.13);color:#ff5555;font-size:1rem;" onclick="removeQ(${queue.indexOf(s)})">✕</button>
+  </div>`;
+  el.innerHTML = queue.map(qHTML).join('');
+  pre.innerHTML = queue.slice(0,3).map((s,i)=>`<div class="q-item"><div class="q-num">${i+1}</div><div class="song-info" style="flex:1"><div class="song-name">${s.name}</div><div class="song-artist">${s.artist}</div></div></div>`).join('');
+}
+
+function doSearch() {
+  const q = document.getElementById('s-input').value.trim().toLowerCase();
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  renderSearch(!q ? SONGS : SONGS.filter(s=>s.name.toLowerCase().includes(q)||s.artist.toLowerCase().includes(q)));
+}
+function filterArtist(a) {
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active', c.dataset.a===a));
+  document.getElementById('s-input').value = a;
+  renderSearch(SONGS.filter(s=>s.artist===a));
+}
+
+function goTab(tab) {
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>t.classList.toggle('active',['play','search','fav','queue'][i]===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  if (tab==='fav') renderFav();
+  if (tab==='queue') renderQueue();
+  if (tab==='search') renderSearch(SONGS);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+// Init
+document.getElementById('artist-chips').innerHTML = ARTISTS.map(a=>`<div class="chip" data-a="${a}" onclick="filterArtist('${a}')">${a}</div>`).join('');
+renderSearch(SONGS); renderFav(); renderQueue();
+</script>
+</body>
+</html>
