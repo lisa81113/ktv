@@ -18,160 +18,173 @@
   --lyric-size: 2.6rem;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); color: var(--text-bright); min-height: 100vh; overflow-x: hidden; }
+html, body { height: 100%; }
+body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); color: var(--text-bright); overflow-x: hidden; }
 
 /* HEADER */
 .header {
   background: linear-gradient(135deg, #2a0800, #5a1800);
   border-bottom: 3px solid var(--gold);
   padding: 12px 18px;
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: center;
   position: sticky; top: 0; z-index: 200;
   box-shadow: 0 3px 20px rgba(0,0,0,0.7);
 }
-.header-title { font-size: 1.8rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px rgba(255,215,0,0.5); letter-spacing: 3px; }
+.header-title { font-size: 1.8rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px rgba(255,215,0,0.5); letter-spacing: 4px; }
 .header-title span { color: var(--accent); }
 
 /* TABS */
-.nav-tabs { display: flex; background: var(--bg-mid); border-bottom: 2px solid var(--gold-dark); }
-.nav-tab { flex: 1; padding: 14px 6px; text-align: center; font-size: 1rem; font-weight: 700; color: var(--text-dim); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; user-select: none; }
+.nav-tabs { display: flex; background: var(--bg-mid); border-bottom: 2px solid var(--gold-dark); position: sticky; top: 58px; z-index: 100; }
+.nav-tab { flex: 1; padding: 13px 6px; text-align: center; font-size: 1rem; font-weight: 700; color: var(--text-dim); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; user-select: none; }
 .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); background: rgba(255,215,0,0.07); }
 
 /* PANELS */
 .panel { display: none; }
 .panel.active { display: block; }
 
-/* ══ KTV 畫面區 ══ */
-.ktv-screen {
+/* ══ PLAY PANEL ══ */
+
+/* YouTube embed container */
+.yt-container {
+  width: 100%;
   background: #000;
   border-bottom: 3px solid var(--gold-dark);
-  min-height: 160px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  position: relative; overflow: hidden;
+  position: relative;
 }
-.ktv-idle {
-  width: 100%; padding: 30px 20px;
+/* 16:9 ratio wrapper */
+.yt-ratio {
+  position: relative;
+  padding-top: 56.25%; /* 16:9 */
+  background: #000;
+}
+.yt-ratio iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: none;
+}
+.yt-idle-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   background: radial-gradient(ellipse at 40% 60%, #1a003a 0%, #000 65%);
-  gap: 10px; text-align: center;
+  gap: 12px; text-align: center; padding: 20px;
+  z-index: 2;
 }
-.ktv-idle .mic { font-size: 4.5rem; }
-.ktv-idle .idle-text { font-size: 1.2rem; color: var(--text-dim); }
+.yt-idle-overlay .mic { font-size: 4rem; }
+.yt-idle-overlay .idle-txt { font-size: 1.15rem; color: var(--text-dim); line-height: 1.6; }
 
-/* Now Playing in screen */
-.now-playing-screen {
+/* Error overlay */
+.yt-error-overlay {
   display: none;
-  width: 100%; padding: 18px 20px;
-  background: radial-gradient(ellipse at 30% 70%, #1a003a 0%, #000808 60%);
-  flex-direction: column; align-items: center; gap: 10px;
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.9);
+  gap: 10px; text-align: center; padding: 16px;
+  z-index: 3;
 }
-.np-title-big {
-  font-size: 1.6rem; font-weight: 900; color: var(--gold);
-  text-shadow: 0 0 20px rgba(255,215,0,0.6);
-  letter-spacing: 3px; text-align: center;
+.yt-error-overlay .err-icon { font-size: 2.5rem; }
+.yt-error-overlay .err-txt { font-size: 0.95rem; color: #ffaaaa; line-height: 1.6; }
+.yt-open-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #cc0000, #ff2222);
+  color: white; font-size: 1rem; font-weight: 700;
+  padding: 11px 20px; border-radius: 12px; border: none;
+  cursor: pointer; font-family: inherit; text-decoration: none;
+  margin-top: 4px;
 }
-.np-artist-big { font-size: 1rem; color: var(--text-dim); }
-.disc-row { display: flex; align-items: center; gap: 16px; }
-.disc {
-  width: 56px; height: 56px; border-radius: 50%;
+
+/* Now playing bar */
+.np-bar {
+  display: none;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--gold-dark);
+  padding: 9px 14px;
+  align-items: center; gap: 12px;
+}
+.np-disc {
+  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
   background: conic-gradient(var(--gold), var(--accent), var(--gold-dark), var(--gold));
-  display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
-  animation: spin 3s linear infinite; animation-play-state: paused; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  animation: spin 3s linear infinite; animation-play-state: paused;
 }
-.disc.spin { animation-play-state: running; }
+.np-disc.spin { animation-play-state: running; }
 @keyframes spin { to { transform: rotate(360deg); } }
+.np-info { flex: 1; min-width: 0; }
+.np-name { font-size: 1rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.np-artist { font-size: 0.85rem; color: var(--text-dim); }
+.np-time { font-size: 0.8rem; color: var(--text-dim); flex-shrink: 0; font-weight: 700; }
 
-/* YouTube 開啟按鈕 */
-.yt-open-btn {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  background: linear-gradient(135deg, #cc0000, #ff0000);
-  color: white; font-size: 1.1rem; font-weight: 900;
-  padding: 14px 24px; border-radius: 14px; border: none;
-  cursor: pointer; width: 100%; font-family: inherit;
-  box-shadow: 0 4px 20px rgba(255,0,0,0.4);
-  letter-spacing: 1px; transition: all 0.15s;
-}
-.yt-open-btn:active { transform: scale(0.96); }
-.yt-logo { font-size: 1.6rem; }
-
-/* 歌詞區 */
+/* LYRIC BOX */
 .lyric-box {
-  background: linear-gradient(180deg, #0d0400 0%, #1a0a00 100%);
-  padding: 18px 16px 14px;
-  min-height: 150px;
+  background: linear-gradient(180deg, #080200 0%, #150800 100%);
+  padding: 16px 14px 12px;
+  min-height: 140px;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   border-bottom: 2px solid var(--gold-dark);
+  cursor: pointer;
+  user-select: none;
 }
-.lyric-prev, .lyric-next {
-  font-size: calc(var(--lyric-size) * 0.55);
-  color: rgba(255,255,255,0.28); line-height: 1.6; text-align: center; min-height: 1.6em;
-  transition: all 0.4s;
-}
+.lyric-tap-hint { font-size: 0.72rem; color: rgba(255,255,255,0.18); margin-bottom: 4px; }
+.lyric-prev, .lyric-next { font-size: calc(var(--lyric-size) * 0.52); color: rgba(255,255,255,0.25); line-height: 1.6; text-align: center; min-height: 1.5em; transition: all 0.3s; }
 .lyric-curr {
   font-size: var(--lyric-size); font-weight: 900; color: var(--gold);
   text-align: center; line-height: 1.4;
-  text-shadow: 0 0 30px rgba(255,215,0,0.9), 0 2px 8px rgba(0,0,0,0.9);
-  margin: 10px 0; letter-spacing: 3px; min-height: 1.4em;
-  transition: opacity 0.3s;
+  text-shadow: 0 0 30px rgba(255,215,0,0.85), 0 2px 8px rgba(0,0,0,0.9);
+  margin: 8px 0; letter-spacing: 3px; min-height: 1.4em;
+  transition: opacity 0.25s;
 }
-.lyric-progress { width: 90%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 12px; overflow: hidden; }
-.lyric-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--accent)); border-radius: 3px; transition: width 0.5s linear; }
-.lyric-counter { font-size: 0.75rem; color: rgba(255,255,255,0.2); margin-top: 5px; }
+.lyric-progress { width: 90%; height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; margin-top: 10px; overflow: hidden; }
+.lyric-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--accent)); border-radius: 3px; transition: width 0.4s linear; }
+.lyric-counter { font-size: 0.7rem; color: rgba(255,255,255,0.18); margin-top: 4px; }
 
-/* 控制區 */
-.controls-area { padding: 12px 14px; background: var(--bg-mid); }
+/* CONTROLS */
+.controls-area { padding: 11px 13px; background: var(--bg-mid); }
 .ctrl-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
-.ctrl-btn { padding: 14px 6px; border: none; border-radius: 12px; font-family: inherit; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: all 0.15s; user-select: none; }
+.ctrl-btn { padding: 13px 5px; border: none; border-radius: 12px; font-family: inherit; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; transition: all 0.15s; user-select: none; }
 .ctrl-btn:active { transform: scale(0.92); }
-.ctrl-btn .ci { font-size: 1.5rem; }
+.ctrl-btn .ci { font-size: 1.45rem; }
 .c-prev, .c-next { background: var(--bg-card); border: 1px solid var(--gold-dark); color: var(--gold); }
 .c-pp { background: linear-gradient(135deg, var(--gold), #d4940a); color: #1a0a00; }
 .c-stop { background: linear-gradient(135deg, #7a0000, #c0392b); color: #fff; }
 
-/* 歌詞速度 */
-.speed-row { background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-.speed-label { font-size: 0.9rem; color: var(--text-dim); flex-shrink: 0; }
-.speed-btns { display: flex; gap: 6px; flex-wrap: wrap; }
-.speed-btn { padding: 8px 12px; border-radius: 8px; border: 2px solid var(--gold-dark); background: transparent; color: var(--gold); font-size: 0.9rem; font-weight: 700; cursor: pointer; font-family: inherit; }
-.speed-btn.active { background: var(--gold); color: #1a0a00; border-color: var(--gold); }
-
-/* 字體大小 */
-.setting-row { background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-.setting-label { font-size: 0.9rem; color: var(--text-dim); flex-shrink: 0; }
-.size-btns { display: flex; gap: 6px; flex-wrap: wrap; }
-.size-btn { padding: 8px 13px; border-radius: 8px; border: 2px solid var(--gold-dark); background: transparent; color: var(--gold); font-size: 0.9rem; font-weight: 700; cursor: pointer; font-family: inherit; }
-.size-btn.active { background: var(--gold); color: #1a0a00; border-color: var(--gold); }
+/* Settings */
+.setting-row { background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 12px; padding: 11px 13px; display: flex; align-items: center; gap: 8px; margin-bottom: 9px; flex-wrap: wrap; }
+.setting-label { font-size: 0.88rem; color: var(--text-dim); flex-shrink: 0; }
+.opt-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.opt-btn { padding: 7px 12px; border-radius: 8px; border: 2px solid var(--gold-dark); background: transparent; color: var(--gold); font-size: 0.88rem; font-weight: 700; cursor: pointer; font-family: inherit; user-select: none; transition: all 0.15s; }
+.opt-btn.active { background: var(--gold); color: #1a0a00; border-color: var(--gold); }
 
 /* Section title */
 .section-title { font-size: 1rem; font-weight: 700; color: var(--gold); margin: 10px 0 8px; display: flex; align-items: center; gap: 8px; }
 .section-title::after { content:''; flex:1; height:1px; background: var(--gold-dark); }
 
-/* ══ SEARCH PANEL ══ */
-#panel-search, #panel-fav, #panel-queue { padding: 14px; }
-.search-row { display: flex; gap: 8px; margin-bottom: 14px; }
-.search-input { flex: 1; padding: 14px; font-size: 1.1rem; font-family: inherit; background: var(--bg-card); border: 2px solid var(--gold-dark); border-radius: 12px; color: var(--text-bright); outline: none; }
+/* ══ SEARCH/FAV/QUEUE PANELS ══ */
+#panel-search, #panel-fav, #panel-queue { padding: 13px; }
+.search-row { display: flex; gap: 8px; margin-bottom: 13px; }
+.search-input { flex: 1; padding: 13px; font-size: 1.1rem; font-family: inherit; background: var(--bg-card); border: 2px solid var(--gold-dark); border-radius: 12px; color: var(--text-bright); outline: none; }
 .search-input:focus { border-color: var(--gold); }
 .search-input::placeholder { color: var(--text-dim); }
-.btn { padding: 14px 18px; font-size: 1rem; font-family: inherit; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; transition: all 0.15s; user-select: none; }
+.btn { padding: 13px 17px; font-size: 1rem; font-family: inherit; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; transition: all 0.15s; user-select: none; }
 .btn:active { transform: scale(0.94); }
 .btn-gold { background: linear-gradient(135deg, var(--gold), #d4940a); color: #1a0a00; }
 .btn-red { background: linear-gradient(135deg, #8b0000, #c0392b); color: #fff; }
-.btn-outline { background: transparent; border: 2px solid var(--gold-dark); color: var(--gold); }
 
-.artist-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-.artist-chip { padding: 9px 16px; background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 20px; font-size: 0.95rem; color: var(--text-dim); cursor: pointer; user-select: none; transition: all 0.15s; }
+.artist-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 13px; }
+.artist-chip { padding: 8px 15px; background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 20px; font-size: 0.93rem; color: var(--text-dim); cursor: pointer; user-select: none; transition: all 0.15s; }
 .artist-chip.active { background: var(--gold); color: #1a0a00; font-weight: 700; border-color: var(--gold); }
 
 /* Song list */
-.song-list { display: flex; flex-direction: column; gap: 10px; }
-.song-item { background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 14px; padding: 13px 14px; display: flex; align-items: center; gap: 10px; user-select: none; transition: all 0.15s; }
-.song-item.playing { border-color: var(--gold); background: rgba(255,215,0,0.08); box-shadow: 0 0 16px rgba(255,215,0,0.2); }
-.song-num { font-size: 0.95rem; color: var(--text-dim); min-width: 26px; text-align: center; font-weight: 700; }
+.song-list { display: flex; flex-direction: column; gap: 9px; }
+.song-item { background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 13px; padding: 12px 13px; display: flex; align-items: center; gap: 9px; transition: all 0.15s; }
+.song-item.playing { border-color: var(--gold); background: rgba(255,215,0,0.08); box-shadow: 0 0 14px rgba(255,215,0,0.18); }
+.song-num { font-size: 0.9rem; color: var(--text-dim); min-width: 24px; text-align: center; font-weight: 700; }
 .song-info { flex: 1; cursor: pointer; }
-.song-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 3px; }
-.song-artist { font-size: 0.9rem; color: var(--text-dim); }
-.song-actions { display: flex; gap: 7px; }
-.icon-btn { width: 42px; height: 42px; border-radius: 50%; border: none; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; user-select: none; transition: all 0.15s; }
+.song-name { font-size: 1.08rem; font-weight: 700; margin-bottom: 2px; }
+.song-artist { font-size: 0.88rem; color: var(--text-dim); }
+.song-actions { display: flex; gap: 6px; }
+.icon-btn { width: 40px; height: 40px; border-radius: 50%; border: none; font-size: 1.15rem; cursor: pointer; display: flex; align-items: center; justify-content: center; user-select: none; transition: all 0.15s; }
 .icon-btn:active { transform: scale(0.88); }
 .fav-btn { background: rgba(255,80,80,0.15); color: #ff7777; }
 .fav-btn.on { background: rgba(255,80,80,0.3); color: #ff2222; }
@@ -179,19 +192,14 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
 .play-btn { background: rgba(255,215,0,0.15); color: var(--gold); }
 
 /* Queue */
-.queue-item { background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 12px; padding: 12px 13px; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.q-num { width: 28px; height: 28px; background: var(--gold); color: #1a0a00; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.85rem; flex-shrink: 0; }
+.queue-item { background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 11px; padding: 11px 12px; display: flex; align-items: center; gap: 9px; margin-bottom: 7px; }
+.q-num { width: 26px; height: 26px; background: var(--gold); color: #1a0a00; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.8rem; flex-shrink: 0; }
 
-/* Empty */
-.empty-state { text-align: center; padding: 40px 20px; color: var(--text-dim); font-size: 1.05rem; }
-.empty-icon { font-size: 3rem; display: block; margin-bottom: 10px; }
-
-/* Tips box */
-.tips-box { background: rgba(255,215,0,0.07); border: 1px solid var(--gold-dark); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; font-size: 0.88rem; color: var(--text-dim); line-height: 1.7; }
-.tips-box b { color: var(--gold); }
+.empty-state { text-align: center; padding: 36px 20px; color: var(--text-dim); font-size: 1rem; }
+.empty-icon { font-size: 2.8rem; display: block; margin-bottom: 10px; }
 
 /* Toast */
-.toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(16px); background: rgba(255,215,0,0.97); color: #1a0a00; padding: 11px 24px; border-radius: 30px; font-size: 1rem; font-weight: 700; opacity: 0; transition: all 0.28s; z-index: 999; white-space: nowrap; pointer-events: none; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(14px); background: rgba(255,215,0,0.97); color: #1a0a00; padding: 10px 22px; border-radius: 28px; font-size: 0.95rem; font-weight: 700; opacity: 0; transition: all 0.26s; z-index: 999; white-space: nowrap; pointer-events: none; box-shadow: 0 4px 18px rgba(0,0,0,0.5); }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
@@ -199,7 +207,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
 
 <div class="header">
   <div class="header-title">🎤 行動<span>KTV</span></div>
-  <div style="font-size:0.8rem;color:var(--text-dim);">老人家專用版</div>
 </div>
 
 <div class="nav-tabs">
@@ -209,37 +216,43 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
   <div class="nav-tab" onclick="switchTab('queue')">📋 點歌</div>
 </div>
 
-<!-- ══ 唱歌 Panel ══ -->
+<!-- ══ 唱歌 ══ -->
 <div class="panel active" id="panel-play">
 
-  <!-- KTV 畫面 -->
-  <div class="ktv-screen">
-    <!-- 閒置狀態 -->
-    <div class="ktv-idle" id="ktv-idle">
-      <span class="mic">🎤</span>
-      <div class="idle-text">請到「搜尋」選一首歌開始唱！</div>
-    </div>
-    <!-- 播放中狀態 -->
-    <div class="now-playing-screen" id="now-playing-screen">
-      <div class="disc-row">
-        <div class="disc" id="main-disc">🎵</div>
-        <div>
-          <div class="np-title-big" id="np-title-big">-</div>
-          <div class="np-artist-big" id="np-artist-big">-</div>
-        </div>
+  <!-- YouTube 內嵌 -->
+  <div class="yt-container">
+    <div class="yt-ratio" id="yt-ratio">
+      <!-- idle -->
+      <div class="yt-idle-overlay" id="yt-idle">
+        <span class="mic">🎤</span>
+        <div class="idle-txt">請到「搜尋」選一首歌<br>開始演唱！</div>
       </div>
-      <!-- YouTube 開啟按鈕 -->
-      <button class="yt-open-btn" id="yt-open-btn" onclick="openYouTube()">
-        <span class="yt-logo">▶️</span>
-        點這裡開啟 YouTube 伴唱帶（有聲音）
-      </button>
+      <!-- error -->
+      <div class="yt-error-overlay" id="yt-error">
+        <span class="err-icon">⚠️</span>
+        <div class="err-txt">此影片不允許嵌入播放<br>請點下方按鈕在 YouTube 開啟</div>
+        <a id="yt-fallback-link" class="yt-open-link" href="#" target="_blank">▶ 開啟 YouTube 播放</a>
+      </div>
+      <!-- player div -->
+      <div id="yt-player"></div>
     </div>
   </div>
 
-  <!-- 歌詞 -->
-  <div class="lyric-box">
+  <!-- Now playing -->
+  <div class="np-bar" id="np-bar">
+    <div class="np-disc" id="np-disc">🎵</div>
+    <div class="np-info">
+      <div class="np-name" id="np-name">-</div>
+      <div class="np-artist" id="np-artist-bar">-</div>
+    </div>
+    <div class="np-time" id="np-time">0:00</div>
+  </div>
+
+  <!-- 歌詞區（點擊可手動換行） -->
+  <div class="lyric-box" onclick="manualNextLyric()" id="lyric-box">
+    <div class="lyric-tap-hint" id="lyric-tap-hint"></div>
     <div class="lyric-prev" id="lyric-prev"></div>
-    <div class="lyric-curr" id="lyric-curr" style="color:var(--text-dim);font-size:1.4rem;">請先選一首歌 🎶</div>
+    <div class="lyric-curr" id="lyric-curr" style="color:var(--text-dim);font-size:1.3rem;">請先選一首歌 🎶</div>
     <div class="lyric-next" id="lyric-next"></div>
     <div class="lyric-progress" id="lyric-progress" style="display:none">
       <div class="lyric-fill" id="lyric-fill" style="width:0%"></div>
@@ -251,34 +264,19 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
   <div class="controls-area">
     <div class="ctrl-row">
       <button class="ctrl-btn c-prev" onclick="playPrev()"><span class="ci">⏮</span>上一首</button>
-      <button class="ctrl-btn c-pp" id="pp-btn" onclick="togglePause()"><span class="ci" id="pp-icon">⏸</span><span id="pp-label">暫停詞</span></button>
+      <button class="ctrl-btn c-pp" id="pp-btn" onclick="togglePause()"><span class="ci" id="pp-icon">▶</span><span id="pp-label">播放</span></button>
       <button class="ctrl-btn c-next" onclick="playNext()"><span class="ci">⏭</span>下一首</button>
       <button class="ctrl-btn c-stop" onclick="stopSong()"><span class="ci">⏹</span>停止</button>
     </div>
 
-    <!-- 提示 -->
-    <div class="tips-box">
-      💡 <b>使用方式：</b>選好歌後，按上方紅色按鈕開啟 YouTube 伴唱帶，<b>回到本頁</b>讓歌詞繼續跑字，邊看 YouTube 邊對這裡的歌詞唱歌！
-    </div>
-
-    <!-- 歌詞速度 -->
-    <div class="speed-row">
-      <span class="speed-label">⏱ 歌詞速度</span>
-      <div class="speed-btns">
-        <button class="speed-btn" onclick="setSpeed(4000)">慢</button>
-        <button class="speed-btn active" onclick="setSpeed(2800)">正常</button>
-        <button class="speed-btn" onclick="setSpeed(2000)">快</button>
-      </div>
-    </div>
-
-    <!-- 字體大小 -->
+    <!-- 歌詞大小 -->
     <div class="setting-row">
       <span class="setting-label">🔤 歌詞大小</span>
-      <div class="size-btns">
-        <button class="size-btn" onclick="setSize('1.8rem')">小</button>
-        <button class="size-btn active" onclick="setSize('2.6rem')">中</button>
-        <button class="size-btn" onclick="setSize('3.4rem')">大</button>
-        <button class="size-btn" onclick="setSize('4.2rem')">特大</button>
+      <div class="opt-btns">
+        <button class="opt-btn" onclick="setSize('1.8rem')">小</button>
+        <button class="opt-btn active" onclick="setSize('2.6rem')">中</button>
+        <button class="opt-btn" onclick="setSize('3.4rem')">大</button>
+        <button class="opt-btn" onclick="setSize('4.2rem')">特大</button>
       </div>
     </div>
 
@@ -288,7 +286,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
   </div>
 </div>
 
-<!-- ══ 搜尋 Panel ══ -->
+<!-- ══ 搜尋 ══ -->
 <div class="panel" id="panel-search">
   <div class="section-title">🔍 輸入歌名或歌手</div>
   <div class="search-row">
@@ -301,17 +299,17 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
   <div class="song-list" id="search-list"></div>
 </div>
 
-<!-- ══ 最愛 Panel ══ -->
+<!-- ══ 最愛 ══ -->
 <div class="panel" id="panel-fav">
   <div class="section-title">❤️ 我的最愛歌單</div>
   <div class="song-list" id="fav-list"></div>
 </div>
 
-<!-- ══ 點歌 Panel ══ -->
+<!-- ══ 點歌 ══ -->
 <div class="panel" id="panel-queue">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
     <div class="section-title" style="margin:0;flex:1;">📋 點歌列表</div>
-    <button class="btn btn-red" onclick="clearQueue()" style="padding:9px 14px;font-size:0.9rem;">清空</button>
+    <button class="btn btn-red" onclick="clearQueue()" style="padding:9px 13px;font-size:0.88rem;">清空</button>
   </div>
   <div id="queue-full-list"></div>
 </div>
@@ -319,265 +317,363 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
 <div class="toast" id="toast"></div>
 
 <script>
-// ─────────────────────────────────────────────
-//  歌曲資料庫
-//  ytSearch = 搜尋關鍵字（用來開啟 YouTube 搜尋）
-//  lyrics / lyricMs = 歌詞與毫秒時間點
-// ─────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════
+   歌曲資料庫
+   ytId     = YouTube 影片 ID（伴唱帶）
+   lyrics   = 歌詞陣列
+   lyricSec = 每句歌詞出現的【秒數】（對應影片時間）
+═══════════════════════════════════════════════════ */
 const SONGS = [
+  // ── 劉歡 ──
   {
-    id:1, name:'愛拼才會贏', artist:'葉啟田', lang:'台語',
-    ytSearch:'愛拼才會贏 葉啟田 伴唱',
-    ytId:'KAONKDpgEwg',
-    lyrics:['一時失志不免怨嘆','一時落魄不免膽寒','那通失去希望','每日醉茫茫',
-      '無魂有體親像稻草人','人生可比是海上的波浪','有時起有時落',
-      '好運歹運 總嘛要照起工來行','三分天注定','七分靠打拼','愛拼才會贏！'],
-    lyricMs:[4000,8000,12000,16000,20000,25000,29000,33000,39000,43000,47000]
+    id:1, name:'好漢歌', artist:'劉歡', lang:'國語',
+    ytId:'nGCFPAFkDMk',
+    lyrics:['路見不平一聲吼','該出手時就出手','風風火火闖九州',
+      '嗯啊依兒呀','誰說女子不如男','男兒心高志氣強',
+      '路見不平一聲吼','風風火火闖九州'],
+    lyricSec:[14,17,20,24,30,34,40,44]
   },
   {
-    id:2, name:'月亮代表我的心', artist:'鄧麗君', lang:'國語',
-    ytSearch:'月亮代表我的心 鄧麗君 伴唱',
+    id:2, name:'從頭再來', artist:'劉歡', lang:'國語',
+    ytId:'czCYBEQp2Tg',
+    lyrics:['昨天所有的榮譽','已變成遙遠的回憶','辛辛苦苦已度過了半生',
+      '今夜重又走入風雨','我不能隨波浮沉','為了我至愛的親人',
+      '再苦再難也要堅強','只為那些期待眼神'],
+    lyricSec:[10,15,20,26,33,37,42,47]
+  },
+  // ── 潘美辰 ──
+  {
+    id:3, name:'我想有個家', artist:'潘美辰', lang:'國語',
+    ytId:'b0rqZFwMaZk',
+    lyrics:['我想有個家','一個不需要多大的地方','在我受傷的時候',
+      '我會想到它','我想有個家','一個不需要華麗的地方',
+      '在我疲倦的時候','我會想到它'],
+    lyricSec:[16,20,25,30,38,42,47,52]
+  },
+  {
+    id:4, name:'你是我的眼', artist:'蕭煌奇', lang:'國語',
+    ytId:'vGEqDTMXbzw',
+    lyrics:['你是我的眼','帶我領略四季的變換',
+      '你是我的眼','帶我穿越擁擠的人潮',
+      '你是我完整的世界','你是我的眼'],
+    lyricSec:[20,24,32,36,42,48]
+  },
+  // ── 林良樂 ──
+  {
+    id:5, name:'心肝寶貝', artist:'林良樂', lang:'台語',
+    ytId:'ywjH3HzJjA0',
+    lyrics:['心肝寶貝','你是我心中的最愛','每天每夜','我都想著你',
+      '心肝寶貝','你是我生命的依賴','有你的地方','才有我的家'],
+    lyricSec:[8,12,17,21,28,32,37,41]
+  },
+  // ── 余天 ──
+  {
+    id:6, name:'榕樹下', artist:'余天', lang:'國語',
+    ytId:'WfKTBGvBSF8',
+    lyrics:['榕樹下','是我出生的地方','榕樹下','有我童年的記憶',
+      '那棵老榕樹','依然在那裡等候','等我回到','家鄉的懷抱裡'],
+    lyricSec:[10,14,19,23,30,35,40,44]
+  },
+  {
+    id:7, name:'來我這裡愛', artist:'余天', lang:'國語',
+    ytId:'rdCCcVAaRcc',
+    lyrics:['來我這裡愛','讓我給你溫暖','來我這裡愛',
+      '你不再孤單','有我在你身旁','不再流淚不再傷'],
+    lyricSec:[8,13,20,24,30,36]
+  },
+  // ── 蘇芮 ──
+  {
+    id:8, name:'跟著感覺走', artist:'蘇芮', lang:'國語',
+    ytId:'WFwCMaSMhY0',
+    lyrics:['跟著感覺走','緊抓住夢的手','腳步越來越輕越來越快活',
+      '跟著感覺走','任風吹過以後','讓夢的顏色飄在風中'],
+    lyricSec:[14,18,22,32,36,40]
+  },
+  {
+    id:9, name:'一樣的月光', artist:'蘇芮', lang:'國語',
+    ytId:'B4GU3sNtcNE',
+    lyrics:['什麼時候童年的夥伴','都離我遠去','什麼時候身旁的人',
+      '已不是當年的人','什麼時候月亮變了','什麼時候花謝了',
+      '一樣的月光','一樣的照著我'],
+    lyricSec:[8,13,18,23,29,33,38,42]
+  },
+  // ── 張惠妹 ──
+  {
+    id:10, name:'我可以抱你嗎', artist:'張惠妹', lang:'國語',
+    ytId:'YZxFaX7Mjtg',
+    lyrics:['我可以抱你嗎','愛人','就這樣把你的背影','收藏了離開',
+      '我可以抱你嗎','你的悲傷','像一個密碼','我根本不懂'],
+    lyricSec:[18,22,27,32,42,46,50,54]
+  },
+  {
+    id:11, name:'解脫', artist:'張惠妹', lang:'國語',
+    ytId:'7kKlJDFoNAk',
+    lyrics:['不要再為我哭泣','你知道我要去追求那個夢想',
+      '讓愛自由','讓我自由','這是我的解脫','也是你的解脫',
+      '讓愛自由','讓一切從頭'],
+    lyricSec:[10,15,22,26,31,36,42,46]
+  },
+  // ── 鄭怡 ──
+  {
+    id:12, name:'月琴', artist:'鄭怡', lang:'國語',
+    ytId:'U2bB4dVGlTo',
+    lyrics:['走過了多少繁華的城市','看遍了多少人間的面孔',
+      '為什麼你的笑容','在我心中揮之不去',
+      '走過了多少漫長的歲月','仍然記得你那把月琴',
+      '月光下的旋律','從未在我心中消失'],
+    lyricSec:[10,16,22,27,36,42,48,53]
+  },
+  {
+    id:13, name:'小雨來得正是時候', artist:'鄭怡', lang:'國語',
+    ytId:'iKRRH2kEMWg',
+    lyrics:['小雨來得正是時候','讓我好好地哭一哭',
+      '把那一份說不清楚的惆悵','都洗個乾乾淨淨',
+      '小雨來得正是時候','讓我暫時忘了你'],
+    lyricSec:[10,16,22,28,36,42]
+  },
+  // ── 鳳飛飛 ──
+  {
+    id:14, name:'掌聲響起', artist:'鳳飛飛', lang:'國語',
+    ytId:'a9p2G_3XeFI',
+    lyrics:['每當我找不到存在的意義','每當我迷失在黑暗裡',
+      '夜空中最亮的星','請照亮我前行',
+      '每當我找不到存在的意義','每當我迷失在黑暗裡',
+      '掌聲響起來','我心更明白'],
+    lyricSec:[8,14,20,25,34,40,46,50]
+  },
+  {
+    id:15, name:'心裡有個謎', artist:'鳳飛飛', lang:'國語',
+    ytId:'6l8K59gmfk8',
+    lyrics:['心裡有個謎','猜不透也說不清','心裡有個謎',
+      '是你讓我如此著迷','到底是因為什麼','讓我這樣放不下',
+      '你的一顰一笑','讓我深深著迷'],
+    lyricSec:[10,14,22,26,32,37,44,48]
+  },
+  // ── 鄧麗君 ──
+  {
+    id:16, name:'月亮代表我的心', artist:'鄧麗君', lang:'國語',
     ytId:'0oNV-u1IKIE',
     lyrics:['你問我愛你有多深','我愛你有幾分','我的情也真','我的愛也真',
       '月亮代表我的心','你問我愛你有多深','我愛你有幾分',
       '你去想一想','你去看一看','月亮代表我的心'],
-    lyricMs:[5000,9000,13000,16000,20000,30000,34000,38000,41000,45000]
+    lyricSec:[5,9,13,16,20,30,34,38,41,45]
   },
   {
-    id:3, name:'甜蜜蜜', artist:'鄧麗君', lang:'國語',
-    ytSearch:'甜蜜蜜 鄧麗君 伴唱 karaoke',
+    id:17, name:'甜蜜蜜', artist:'鄧麗君', lang:'國語',
     ytId:'qMaWhkellHo',
     lyrics:['甜蜜蜜你笑得甜蜜蜜','好像花兒開在春風裡','開在春風裡',
       '在哪裡在哪裡見過你','你的笑容這樣熟悉','我一時想不起',
       '啊～在夢裡','夢裡夢裡見過你','甜蜜笑得多甜蜜'],
-    lyricMs:[4000,8000,12000,18000,22000,26000,30000,33000,37000]
+    lyricSec:[4,8,12,18,22,26,30,33,37]
   },
+  // ── 葉啟田 ──
   {
-    id:4, name:'小城故事', artist:'鄧麗君', lang:'國語',
-    ytSearch:'小城故事 鄧麗君 伴唱 karaoke',
-    ytId:'5JNmkK1cJvk',
-    lyrics:['小城故事多','充滿喜和樂','若是你到小城來','收穫特別多',
-      '看似一幅畫','聽像一首歌','人生境界真善美','這裡已包括',
-      '談的談說的說','小城故事真不錯','請你的朋友一起來','小城來做客'],
-    lyricMs:[4000,7000,10000,14000,19000,22000,25000,29000,35000,38000,41000,45000]
-  },
-  {
-    id:5, name:'何日君再來', artist:'鄧麗君', lang:'國語',
-    ytSearch:'何日君再來 鄧麗君 伴唱 karaoke',
-    ytId:'E3IG3KXKWLA',
-    lyrics:['好花不常開','好景不常在','愁堆解笑眉','淚灑相思帶',
-      '今宵離別後','何日君再來','喝完了這杯','請進點小菜',
-      '人生難得幾回醉','不歡更何待'],
-    lyricMs:[5000,9000,13000,17000,22000,26000,31000,34000,38000,42000]
-  },
-  {
-    id:6, name:'思慕的人', artist:'洪榮宏', lang:'台語',
-    ytSearch:'思慕的人 洪榮宏 伴唱 karaoke',
-    ytId:'wDaXCnrGqkk',
-    lyrics:['秋風啊秋雨','送走了多少的情','月娘照著孤單的我','思念著你的容情',
-      '啊～思慕的人','你到底在哪裡','等你呀等你啊','等到心肝碎'],
-    lyricMs:[5000,10000,15000,20000,27000,31000,36000,40000]
-  },
-  {
-    id:7, name:'黃昏的故鄉', artist:'文夏', lang:'台語',
-    ytSearch:'黃昏的故鄉 文夏 伴唱 karaoke',
-    ytId:'9F3IxdXKcPs',
-    lyrics:['每當太陽慢慢落下山','天色漸漸暗下來','思念故鄉的情感','湧上心頭來',
-      '啊～故鄉的青山','啊～故鄉的綠水','夢中常看見','你美麗的面影'],
-    lyricMs:[5000,10000,15000,19000,26000,30000,35000,39000]
-  },
-  {
-    id:8, name:'港都夜雨', artist:'洪一峰', lang:'台語',
-    ytSearch:'港都夜雨 洪一峰 伴唱 karaoke',
-    ytId:'CkQBKhB5Ts0',
-    lyrics:['一個人客倚船邊','無聊看著海','想起家中的愛人','夢裡相見才',
-      '港都的夜雨啊','你落於誰的心內','愛人等你的心肝','不知你知不知'],
-    lyricMs:[6000,11000,16000,21000,28000,33000,38000,43000]
-  },
-  {
-    id:9, name:'往事只能回味', artist:'尤雅', lang:'國語',
-    ytSearch:'往事只能回味 尤雅 伴唱 karaoke',
-    ytId:'2tDEqOgpPnk',
-    lyrics:['時光一逝永不回','往事只能回味','憶童年時竹馬青梅','兩小無猜日月長',
-      '但願那海棠花','還在寂寞的開著','等著我讓我再回到','你溫柔的懷抱裡'],
-    lyricMs:[4000,8000,13000,18000,24000,28000,32000,37000]
-  },
-  {
-    id:10, name:'愛你一萬年', artist:'伍佰', lang:'國語',
-    ytSearch:'愛你一萬年 伍佰 伴唱 karaoke',
-    ytId:'TWm_fFEd4QA',
-    lyrics:['說過要愛你一萬年','絕對不改變','不管天有多高','地有多遠',
-      '我的心永遠','只是愛著你','說過要愛你一萬年','一萬年以後',
-      '還是一樣的感覺'],
-    lyricMs:[5000,9000,13000,16000,20000,23000,30000,34000,38000]
-  },
-  {
-    id:11, name:'浪人情歌', artist:'伍佰', lang:'國語',
-    ytSearch:'浪人情歌 伍佰 伴唱 karaoke',
-    ytId:'S3_OrJLdFpA',
-    lyrics:['我無法離開你','就像無法停止呼吸','雖然你無情無義','你卻是我唯一',
-      '我的心整個','都已沉醉在你的懷裡','寶貝對不起','是我不好'],
-    lyricMs:[8000,13000,18000,23000,29000,33000,39000,43000]
-  },
-  {
-    id:12, name:'綠島小夜曲', artist:'紫薇', lang:'國語',
-    ytSearch:'綠島小夜曲 伴唱 karaoke',
-    ytId:'JhXfcWCk3fk',
-    lyrics:['這綠島像一隻船','在月夜裡搖呀搖','姑娘呀你也在我心海裡飄',
-      '讓我的歌聲隨那微風','吹開了你的窗簾','讓我的衷情','隨那流水','不斷的向你傾訴'],
-    lyricMs:[5000,9000,14000,21000,25000,30000,34000,38000]
-  },
-  {
-    id:13, name:'快樂的出帆', artist:'洪一峰', lang:'台語',
-    ytSearch:'快樂的出帆 洪一峰 伴唱',
-    ytId:'',
-    lyrics:['今日天氣真好','風平海也靜','趁這個機會咱出帆','快樂的出帆',
-      '勇敢向前衝啊','相信咱會贏','快樂的出帆','揚起帆來去'],
-    lyricMs:[5000,9000,14000,18000,24000,28000,33000,37000]
-  },
-  {
-    id:14, name:'恰似你的溫柔', artist:'蔡琴', lang:'國語',
-    ytSearch:'恰似你的溫柔 蔡琴 伴唱 karaoke',
-    ytId:'',
-    lyrics:['某年某月的某一天','就像一張破碎的臉','難以開口道再見','就讓一切走遠',
-      '這不是件容易的事','我們卻都沒有哭泣','讓它淡淡地來','讓它好好地去'],
-    lyricMs:[5000,9000,14000,18000,24000,28000,33000,37000]
-  },
-  {
-    id:15, name:'夜來香', artist:'鄧麗君', lang:'國語',
-    ytSearch:'夜來香 鄧麗君 伴唱 karaoke',
-    ytId:'',
-    lyrics:['那南風吹來清涼','那夜鶯啼聲細唱','月下的花兒都入夢',
-      '只有那夜來香','吐露著芬芳','夜來香','我為你歌唱','夜來香','我為你思量'],
-    lyricMs:[5000,9000,13000,18000,22000,26000,30000,34000,38000]
+    id:18, name:'愛拼才會贏', artist:'葉啟田', lang:'台語',
+    ytId:'KAONKDpgEwg',
+    lyrics:['一時失志不免怨嘆','一時落魄不免膽寒','那通失去希望','每日醉茫茫',
+      '無魂有體親像稻草人','人生可比是海上的波浪','有時起有時落',
+      '好運歹運 總嘛要照起工來行','三分天注定','七分靠打拼','愛拼才會贏！'],
+    lyricSec:[4,8,12,16,20,25,29,33,39,43,47]
   },
 ];
 
-const ARTISTS = ['鄧麗君','葉啟田','伍佰','洪一峰','文夏','洪榮宏','尤雅','紫薇','蔡琴'];
+const ARTISTS = ['劉歡','潘美辰','林良樂','余天','蘇芮','張惠妹','鄭怡','鳳飛飛'];
 
-// ── State ──
+/* ── State ── */
 let queue = [];
 let favorites = [];
-try { favorites = JSON.parse(localStorage.getItem('ktv_fav3') || '[]'); } catch(e){}
+try { favorites = JSON.parse(localStorage.getItem('ktv_fav4')||'[]'); } catch(e){}
 let currentSong = null;
-let isPlaying = false;
-let lyricTimer = null;
-let lyricIdx = 0;
-let songStartTime = 0;
-let lyricSpeed = 2800;
-let isPaused = false;
-let pausedAt = 0;
+let ytPlayer = null;
+let ytReady = false;
+let pendingPlay = null;
+let syncTimer = null;
+let lastLyricIdx = -1;
 
-// ── Play ──
+/* ═══════════════════════════════════
+   YouTube IFrame API
+═══════════════════════════════════ */
+(function(){
+  const s = document.createElement('script');
+  s.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(s);
+})();
+
+window.onYouTubeIframeAPIReady = function() {
+  ytReady = true;
+  // Create a hidden player first to initialise the API
+  ytPlayer = new YT.Player('yt-player', {
+    height:'100%', width:'100%',
+    videoId:'',
+    playerVars:{ autoplay:0, controls:1, rel:0, playsinline:1, modestbranding:1, origin: location.origin },
+    events:{
+      onReady: onPlayerReady,
+      onStateChange: onPlayerStateChange,
+      onError: onPlayerError
+    }
+  });
+};
+
+function onPlayerReady(e) {
+  if (pendingPlay) { loadAndPlay(pendingPlay); pendingPlay = null; }
+}
+
+function onPlayerStateChange(e) {
+  const s = e.data;
+  if (s === YT.PlayerState.PLAYING) {
+    document.getElementById('pp-icon').textContent = '⏸';
+    document.getElementById('pp-label').textContent = '暫停';
+    document.getElementById('np-disc').classList.add('spin');
+    document.getElementById('yt-error').style.display = 'none';
+    startSyncTimer();
+  } else if (s === YT.PlayerState.PAUSED) {
+    document.getElementById('pp-icon').textContent = '▶';
+    document.getElementById('pp-label').textContent = '播放';
+    document.getElementById('np-disc').classList.remove('spin');
+  } else if (s === YT.PlayerState.ENDED) {
+    document.getElementById('np-disc').classList.remove('spin');
+    stopSyncTimer();
+    setTimeout(playNext, 1200);
+  } else if (s === YT.PlayerState.BUFFERING) {
+    // keep spinner
+  }
+}
+
+function onPlayerError(e) {
+  // Error codes 100,101,150 = embedding not allowed
+  console.log('YT error:', e.data);
+  showEmbedError();
+}
+
+function showEmbedError() {
+  if (!currentSong) return;
+  const err = document.getElementById('yt-error');
+  err.style.display = 'flex';
+  const link = document.getElementById('yt-fallback-link');
+  link.href = 'https://www.youtube.com/watch?v=' + currentSong.ytId;
+  stopSyncTimer();
+}
+
+/* ═══════════════════════════════════
+   Play logic
+═══════════════════════════════════ */
 function playSong(id) {
-  const song = SONGS.find(s => s.id === id);
+  const song = SONGS.find(s=>s.id===id);
   if (!song) return;
-  if (lyricTimer) { clearInterval(lyricTimer); lyricTimer = null; }
 
   currentSong = song;
-  lyricIdx = 0;
-  isPaused = false;
-  isPlaying = true;
+  lastLyricIdx = -1;
+  stopSyncTimer();
 
-  // Show now playing screen
-  document.getElementById('ktv-idle').style.display = 'none';
-  document.getElementById('now-playing-screen').style.display = 'flex';
-  document.getElementById('np-title-big').textContent = song.name;
-  document.getElementById('np-artist-big').textContent = song.artist + ' · ' + song.lang;
-  document.getElementById('main-disc').classList.add('spin');
+  // Update UI immediately
+  document.getElementById('np-bar').style.display = 'flex';
+  document.getElementById('np-name').textContent = song.name;
+  document.getElementById('np-artist-bar').textContent = song.artist + ' · ' + song.lang;
   document.getElementById('lyric-progress').style.display = 'block';
-
-  // pp button
+  document.getElementById('lyric-tap-hint').textContent = '👆 點擊歌詞區可手動換行';
+  document.getElementById('yt-idle').style.display = 'none';
+  document.getElementById('yt-error').style.display = 'none';
   document.getElementById('pp-icon').textContent = '⏸';
-  document.getElementById('pp-label').textContent = '暫停詞';
+  document.getElementById('pp-label').textContent = '暫停';
 
-  renderLyric();
-  startLyricTimer();
-  switchTab('play');
-  showToast('🎵 ' + song.name + ' — 按紅色按鈕開 YouTube！');
-}
+  renderLyricAt(0);
 
-function openYouTube() {
-  if (!currentSong) return;
-  // Try direct video first, fallback to search
-  const ytId = currentSong.ytId;
-  let url;
-  if (ytId) {
-    // Try YouTube app deep link first, fallback to web
-    url = 'https://www.youtube.com/watch?v=' + ytId;
-  } else {
-    url = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(currentSong.ytSearch);
+  if (!ytReady || !ytPlayer) {
+    pendingPlay = song;
+    showToast('⏳ 載入中...');
+    return;
   }
-  window.open(url, '_blank');
-  showToast('▶ 已開啟 YouTube！');
+  loadAndPlay(song);
+  switchTab('play');
+  showToast('🎵 ' + song.name);
 }
 
-function startLyricTimer() {
-  if (lyricTimer) clearInterval(lyricTimer);
-  songStartTime = Date.now() - (pausedAt || 0);
-  lyricTimer = setInterval(() => {
-    if (isPaused || !currentSong) return;
-    const elapsed = Date.now() - songStartTime;
+function loadAndPlay(song) {
+  document.getElementById('yt-error').style.display = 'none';
+  ytPlayer.loadVideoById({ videoId: song.ytId, startSeconds: 0 });
+}
+
+/* ═══════════════════════════════════
+   Lyric sync — polls YT current time
+═══════════════════════════════════ */
+function startSyncTimer() {
+  stopSyncTimer();
+  syncTimer = setInterval(() => {
+    if (!currentSong || !ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+
+    const sec = ytPlayer.getCurrentTime();
+
+    // Update time display
+    document.getElementById('np-time').textContent = formatTime(sec);
+
+    // Find current lyric index based on video time
+    const times = currentSong.lyricSec;
     let idx = 0;
-    for (let i = 0; i < currentSong.lyricMs.length; i++) {
-      if (elapsed >= currentSong.lyricMs[i]) idx = i;
+    for (let i = 0; i < times.length; i++) {
+      if (sec >= times[i]) idx = i; else break;
     }
-    if (idx !== lyricIdx) { lyricIdx = idx; renderLyric(); }
-    // End of song
-    if (elapsed > (currentSong.lyricMs[currentSong.lyricMs.length-1] + lyricSpeed)) {
-      if (queue.length > 0) { clearInterval(lyricTimer); setTimeout(playNext, 1200); }
+
+    if (idx !== lastLyricIdx) {
+      lastLyricIdx = idx;
+      renderLyricAt(idx);
     }
-  }, 250);
+  }, 200);
 }
 
-function renderLyric() {
+function stopSyncTimer() {
+  if (syncTimer) { clearInterval(syncTimer); syncTimer = null; }
+}
+
+function renderLyricAt(idx) {
   if (!currentSong) return;
   const L = currentSong.lyrics;
-  const i = Math.min(lyricIdx, L.length - 1);
+  const i = Math.min(idx, L.length - 1);
   document.getElementById('lyric-prev').textContent = i > 0 ? L[i-1] : '';
   const curr = document.getElementById('lyric-curr');
   curr.textContent = L[i] || '';
   curr.style.color = 'var(--gold)';
   curr.style.fontSize = 'var(--lyric-size)';
   document.getElementById('lyric-next').textContent = i < L.length-1 ? L[i+1] : '';
-  document.getElementById('lyric-fill').style.width = Math.round(((i+1)/L.length)*100) + '%';
+  const pct = Math.round(((i+1)/L.length)*100);
+  document.getElementById('lyric-fill').style.width = pct + '%';
   document.getElementById('lyric-counter').textContent = (i+1) + ' / ' + L.length + ' 句';
 }
 
+// Manual lyric advance (tap lyric area)
+function manualNextLyric() {
+  if (!currentSong) return;
+  const next = Math.min(lastLyricIdx + 1, currentSong.lyrics.length - 1);
+  lastLyricIdx = next;
+  renderLyricAt(next);
+}
+
 function togglePause() {
-  if (!currentSong) { showToast('請先選擇一首歌！'); return; }
-  isPaused = !isPaused;
-  if (isPaused) {
-    pausedAt = Date.now() - songStartTime;
-    document.getElementById('main-disc').classList.remove('spin');
-    document.getElementById('pp-icon').textContent = '▶';
-    document.getElementById('pp-label').textContent = '繼續詞';
-    showToast('⏸ 歌詞暫停');
-  } else {
-    songStartTime = Date.now() - pausedAt;
-    document.getElementById('main-disc').classList.add('spin');
-    document.getElementById('pp-icon').textContent = '⏸';
-    document.getElementById('pp-label').textContent = '暫停詞';
-    showToast('▶ 歌詞繼續');
-  }
+  if (!currentSong || !ytPlayer) { showToast('請先選一首歌！'); return; }
+  const s = ytPlayer.getPlayerState();
+  if (s === YT.PlayerState.PLAYING) { ytPlayer.pauseVideo(); }
+  else { ytPlayer.playVideo(); }
 }
 
 function stopSong() {
-  if (lyricTimer) { clearInterval(lyricTimer); lyricTimer = null; }
-  currentSong = null; isPlaying = false; isPaused = false; lyricIdx = 0; pausedAt = 0;
-  document.getElementById('ktv-idle').style.display = 'flex';
-  document.getElementById('now-playing-screen').style.display = 'none';
-  document.getElementById('main-disc').classList.remove('spin');
+  stopSyncTimer();
+  if (ytPlayer && typeof ytPlayer.stopVideo === 'function') { try{ytPlayer.stopVideo();}catch(e){} }
+  currentSong = null; lastLyricIdx = -1;
+  document.getElementById('np-bar').style.display = 'none';
+  document.getElementById('np-disc').classList.remove('spin');
+  document.getElementById('np-time').textContent = '0:00';
+  document.getElementById('yt-idle').style.display = 'flex';
+  document.getElementById('yt-error').style.display = 'none';
+  document.getElementById('lyric-prev').textContent = '';
   const curr = document.getElementById('lyric-curr');
   curr.textContent = '請先選一首歌 🎶';
-  curr.style.color = 'var(--text-dim)'; curr.style.fontSize = '1.4rem';
-  document.getElementById('lyric-prev').textContent = '';
+  curr.style.color = 'var(--text-dim)'; curr.style.fontSize = '1.3rem';
   document.getElementById('lyric-next').textContent = '';
   document.getElementById('lyric-fill').style.width = '0%';
   document.getElementById('lyric-counter').textContent = '';
   document.getElementById('lyric-progress').style.display = 'none';
-  document.getElementById('pp-icon').textContent = '⏸';
-  document.getElementById('pp-label').textContent = '暫停詞';
+  document.getElementById('lyric-tap-hint').textContent = '';
+  document.getElementById('pp-icon').textContent = '▶';
+  document.getElementById('pp-label').textContent = '播放';
   showToast('⏹ 已停止');
 }
 
@@ -585,53 +681,49 @@ function playNext() {
   if (queue.length > 0) {
     const nxt = queue.shift(); renderQueueFull(); renderQueuePreview(); playSong(nxt.id);
   } else if (currentSong) {
-    const idx = SONGS.findIndex(s => s.id === currentSong.id);
-    playSong(SONGS[(idx+1) % SONGS.length].id);
+    const idx = SONGS.findIndex(s=>s.id===currentSong.id);
+    playSong(SONGS[(idx+1)%SONGS.length].id);
   }
 }
 function playPrev() {
-  if (currentSong) {
-    const idx = SONGS.findIndex(s => s.id === currentSong.id);
-    playSong(SONGS[(idx-1+SONGS.length) % SONGS.length].id);
-  }
+  if (!currentSong) return;
+  const idx = SONGS.findIndex(s=>s.id===currentSong.id);
+  playSong(SONGS[(idx-1+SONGS.length)%SONGS.length].id);
 }
 
-// ── Speed / Size ──
-function setSpeed(ms) {
-  lyricSpeed = ms;
-  document.querySelectorAll('.speed-btn').forEach((b,i) => {
-    b.classList.toggle('active', [4000,2800,2000][i] === ms);
-  });
-  showToast('歌詞速度已調整');
+function formatTime(sec) {
+  sec = Math.floor(sec);
+  return Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0');
 }
+
+/* ── Font size ── */
 function setSize(sz) {
   document.documentElement.style.setProperty('--lyric-size', sz);
-  document.querySelectorAll('.size-btn').forEach((b,i) => {
+  document.querySelectorAll('.opt-btn').forEach((b,i) => {
     b.classList.toggle('active', ['1.8rem','2.6rem','3.4rem','4.2rem'][i] === sz);
   });
-  if (currentSong) renderLyric();
+  if (currentSong) renderLyricAt(lastLyricIdx < 0 ? 0 : lastLyricIdx);
 }
 
-// ── Favorites ──
+/* ── Favorites ── */
 function toggleFav(id) {
-  if (favorites.includes(id)) { favorites = favorites.filter(f=>f!==id); showToast('已移除最愛'); }
+  if (favorites.includes(id)) { favorites=favorites.filter(f=>f!==id); showToast('已移除最愛'); }
   else { favorites.push(id); showToast('❤️ 已加入最愛！'); }
-  try { localStorage.setItem('ktv_fav3', JSON.stringify(favorites)); } catch(e){}
-  renderFavList();
-  doSearch();
+  try{localStorage.setItem('ktv_fav4',JSON.stringify(favorites));}catch(e){}
+  renderFavList(); doSearch();
 }
 
-// ── Queue ──
+/* ── Queue ── */
 function addToQueue(id) {
-  const song = SONGS.find(s=>s.id===id); if (!song) return;
-  if (queue.find(s=>s.id===id)) { showToast('已在點歌列表中'); return; }
+  const song=SONGS.find(s=>s.id===id); if(!song) return;
+  if(queue.find(s=>s.id===id)){showToast('已在點歌列表中');return;}
   queue.push(song); renderQueueFull(); renderQueuePreview();
-  showToast('➕ 已加入：' + song.name);
+  showToast('➕ 已加入：'+song.name);
 }
-function removeQueue(i) { queue.splice(i,1); renderQueueFull(); renderQueuePreview(); }
-function clearQueue() { queue=[]; renderQueueFull(); renderQueuePreview(); showToast('已清空點歌列表'); }
+function removeQueue(i){queue.splice(i,1);renderQueueFull();renderQueuePreview();}
+function clearQueue(){queue=[];renderQueueFull();renderQueuePreview();showToast('已清空點歌列表');}
 
-// ── Render ──
+/* ── Render ── */
 function songItemHTML(s, num) {
   const isFav = favorites.includes(s.id);
   const isNP = currentSong && currentSong.id === s.id;
@@ -648,51 +740,51 @@ function songItemHTML(s, num) {
     </div>
   </div>`;
 }
-function renderSongList(songs, elId) {
-  document.getElementById(elId).innerHTML = songs.length
-    ? songs.map((s,i)=>songItemHTML(s,i+1)).join('')
-    : '<div class="empty-state"><span class="empty-icon">😔</span>找不到相關歌曲</div>';
+function renderSongList(songs,elId){
+  document.getElementById(elId).innerHTML=songs.length
+    ?songs.map((s,i)=>songItemHTML(s,i+1)).join('')
+    :'<div class="empty-state"><span class="empty-icon">😔</span>找不到相關歌曲</div>';
 }
-function renderFavList() {
-  const favS = SONGS.filter(s=>favorites.includes(s.id));
-  document.getElementById('fav-list').innerHTML = favS.length
-    ? favS.map((s,i)=>songItemHTML(s,i+1)).join('')
-    : '<div class="empty-state"><span class="empty-icon">💝</span>還沒有最愛歌曲<br>按歌曲旁的 🤍 加入！</div>';
+function renderFavList(){
+  const favS=SONGS.filter(s=>favorites.includes(s.id));
+  document.getElementById('fav-list').innerHTML=favS.length
+    ?favS.map((s,i)=>songItemHTML(s,i+1)).join('')
+    :'<div class="empty-state"><span class="empty-icon">💝</span>還沒有最愛歌曲<br>按歌曲旁的 🤍 加入！</div>';
 }
-function renderQueueFull() {
-  document.getElementById('queue-full-list').innerHTML = queue.length
-    ? queue.map((s,i)=>`<div class="queue-item">
+function renderQueueFull(){
+  document.getElementById('queue-full-list').innerHTML=queue.length
+    ?queue.map((s,i)=>`<div class="queue-item">
         <div class="q-num">${i+1}</div>
         <div class="song-info"><div class="song-name">${s.name}</div><div class="song-artist">${s.artist}</div></div>
         <button class="icon-btn" style="background:rgba(200,0,0,0.15);color:#ff6666;" onclick="removeQueue(${i})">✕</button>
       </div>`).join('')
-    : '<div class="empty-state"><span class="empty-icon">🎶</span>點歌列表是空的<br>去搜尋歌曲並按 ➕ 加入！</div>';
+    :'<div class="empty-state"><span class="empty-icon">🎶</span>點歌列表是空的<br>去搜尋歌曲並按 ➕ 加入！</div>';
 }
-function renderQueuePreview() {
-  const el = document.getElementById('queue-preview-area');
-  if (!queue.length) { el.innerHTML = '<div style="color:var(--text-dim);font-size:0.9rem;text-align:center;padding:8px;">點歌列表是空的</div>'; return; }
-  el.innerHTML = queue.slice(0,3).map((s,i)=>`<div class="queue-item">
+function renderQueuePreview(){
+  const el=document.getElementById('queue-preview-area');
+  if(!queue.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.9rem;text-align:center;padding:8px;">點歌列表是空的</div>';return;}
+  el.innerHTML=queue.slice(0,3).map((s,i)=>`<div class="queue-item">
     <div class="q-num">${i+1}</div>
     <div class="song-info"><div class="song-name">${s.name}</div><div class="song-artist">${s.artist}</div></div>
-  </div>`).join('') + (queue.length>3?`<div style="text-align:center;color:var(--text-dim);font-size:0.85rem;padding:6px;">還有 ${queue.length-3} 首...</div>`:'');
+  </div>`).join('')+(queue.length>3?`<div style="text-align:center;color:var(--text-dim);font-size:0.85rem;padding:6px;">還有 ${queue.length-3} 首...</div>`:'');
 }
-function renderArtistChips() {
-  document.getElementById('artist-chips').innerHTML = ARTISTS.map(a=>
+function renderArtistChips(){
+  document.getElementById('artist-chips').innerHTML=ARTISTS.map(a=>
     `<div class="artist-chip" onclick="filterArtist('${a}')">${a}</div>`).join('');
 }
-function filterArtist(a) {
+function filterArtist(a){
   document.querySelectorAll('.artist-chip').forEach(c=>c.classList.toggle('active',c.textContent===a));
-  document.getElementById('search-input').value = a;
+  document.getElementById('search-input').value=a;
   renderSongList(SONGS.filter(s=>s.artist===a),'search-list');
 }
 let lastQ='';
-function doSearch() {
-  const q = document.getElementById('search-input').value.trim();
-  lastQ = q;
+function doSearch(){
+  const q=document.getElementById('search-input').value.trim();
+  lastQ=q;
   document.querySelectorAll('.artist-chip').forEach(c=>c.classList.remove('active'));
   renderSongList(q?SONGS.filter(s=>s.name.includes(q)||s.artist.includes(q)):SONGS,'search-list');
 }
-function switchTab(tab) {
+function switchTab(tab){
   ['play','search','fav','queue'].forEach((t,i)=>{
     document.querySelectorAll('.nav-tab')[i].classList.toggle('active',t===tab);
     document.getElementById('panel-'+t).classList.toggle('active',t===tab);
@@ -701,7 +793,7 @@ function switchTab(tab) {
   if(tab==='queue') renderQueueFull();
   if(tab==='search') renderSongList(lastQ?SONGS.filter(s=>s.name.includes(lastQ)||s.artist.includes(lastQ)):SONGS,'search-list');
 }
-function showToast(msg) {
+function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2200);
@@ -710,9 +802,7 @@ function showToast(msg) {
 // Init
 renderArtistChips();
 renderSongList(SONGS,'search-list');
-renderFavList();
-renderQueueFull();
-renderQueuePreview();
+renderFavList(); renderQueueFull(); renderQueuePreview();
 </script>
 </body>
 </html>
