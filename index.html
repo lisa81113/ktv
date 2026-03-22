@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>行動KTV 🎤</title>
+<!-- PWA 設定 -->
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="行動KTV">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="theme-color" content="#FFD700">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -306,7 +314,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
 /* ════════════════════════════════════
    設定
 ════════════════════════════════════ */
-const ARTISTS = ['劉歡','潘美辰','林良樂','余天','蘇芮','張惠妹','鄭怡','鳳飛飛','鄧麗君','任賢齊','張信哲'];
+const ARTISTS = ['劉歡','潘美辰','林良樂','余天','蘇芮','張惠妹','鄭怡','鳳飛飛','鄧麗君','周華健'];
 // 搜尋時自動加上的關鍵字，讓結果偏向伴唱帶
 const SEARCH_SUFFIX = ' 伴唱 karaoke';
 
