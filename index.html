@@ -187,7 +187,8 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
     <div class="np-time" id="np-time">0:00</div>
   </div>
 
-  <div class="lyric-box" onclick="manualNext()" id="lyric-box">
+  <!-- 歌詞區塊（預設隱藏） -->
+  <div class="lyric-box" onclick="manualNext()" id="lyric-box" style="display:none">
     <div class="lyric-tap-hint" id="lyric-tap-hint"></div>
     <div class="lyric-prev" id="lyric-prev"></div>
     <div class="lyric-curr" id="lyric-curr" style="color:var(--text-dim);font-size:1.3rem;">請先選一首歌 🎶</div>
@@ -204,6 +205,16 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
       <button class="ctrl-btn c-pp" onclick="togglePause()"><span class="ci" id="pp-icon">▶</span><span id="pp-label">播放</span></button>
       <button class="ctrl-btn c-next" onclick="playNext()"><span class="ci">⏭</span>下一首</button>
       <button class="ctrl-btn c-stop" onclick="stopSong()"><span class="ci">⏹</span>停止</button>
+    </div>
+
+    <!-- 歌詞切換 + 全螢幕 -->
+    <div style="display:flex;gap:8px;margin-bottom:8px;">
+      <button class="ctrl-btn" id="lyric-toggle-btn" onclick="toggleLyric()" style="flex:1;background:var(--bg-card);border:1px solid var(--gold-dark);color:var(--gold);padding:13px 6px;">
+        <span class="ci">📝</span><span id="lyric-toggle-label">顯示歌詞</span>
+      </button>
+      <button class="ctrl-btn" onclick="toggleFullscreen()" id="fs-btn" style="flex:1;background:var(--bg-card);border:1px solid var(--gold-dark);color:var(--gold);padding:13px 6px;">
+        <span class="ci" id="fs-icon">⛶</span><span id="fs-label">全螢幕</span>
+      </button>
     </div>
 
     <button class="btn btn-gold" id="edit-lyric-btn" onclick="openLyricModal()" style="width:100%;margin-bottom:8px;display:none;">✏️ 編輯歌詞 / 時間點</button>
@@ -303,7 +314,7 @@ const SEARCH_SUFFIX = ' 伴唱 karaoke';
    State
 ════════════════════════════════════ */
 // ★★★ 在這裡填入你的 YouTube Data API v3 金鑰 ★★★
-let apiKey = 'AIzaSyBwu5ewuV95FLUyh6ngAU3q1RJIcIVFLrU';
+let apiKey = '請填入你的API金鑰';
 // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
 let queue = [];
@@ -687,6 +698,51 @@ function searchArtist(a) {
   document.getElementById('search-input').value=a;
   doSearch();
 }
+
+/* ── 歌詞顯示/隱藏 ── */
+let lyricVisible = false;
+function toggleLyric() {
+  lyricVisible = !lyricVisible;
+  document.getElementById('lyric-box').style.display = lyricVisible ? 'flex' : 'none';
+  document.getElementById('lyric-toggle-label').textContent = lyricVisible ? '隱藏歌詞' : '顯示歌詞';
+  document.getElementById('lyric-toggle-btn').style.borderColor = lyricVisible ? 'var(--gold)' : 'var(--gold-dark)';
+  document.getElementById('lyric-toggle-btn').style.color = lyricVisible ? 'var(--gold)' : 'var(--text-dim)';
+}
+
+/* ── 全螢幕 ── */
+function toggleFullscreen() {
+  const el = document.documentElement;
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    // 進入全螢幕
+    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
+    if (req) req.call(el);
+    document.getElementById('fs-icon').textContent = '✕';
+    document.getElementById('fs-label').textContent = '離開全螢幕';
+    document.getElementById('fs-btn').style.borderColor = 'var(--gold)';
+  } else {
+    // 離開全螢幕
+    const ex = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+    if (ex) ex.call(document);
+    document.getElementById('fs-icon').textContent = '⛶';
+    document.getElementById('fs-label').textContent = '全螢幕';
+    document.getElementById('fs-btn').style.borderColor = 'var(--gold-dark)';
+  }
+}
+// 監聽使用者按 ESC 離開全螢幕時同步更新按鈕
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement) {
+    document.getElementById('fs-icon').textContent = '⛶';
+    document.getElementById('fs-label').textContent = '全螢幕';
+    document.getElementById('fs-btn').style.borderColor = 'var(--gold-dark)';
+  }
+});
+document.addEventListener('webkitfullscreenchange', () => {
+  if (!document.webkitFullscreenElement) {
+    document.getElementById('fs-icon').textContent = '⛶';
+    document.getElementById('fs-label').textContent = '全螢幕';
+    document.getElementById('fs-btn').style.borderColor = 'var(--gold-dark)';
+  }
+});
 
 function setSize(sz) {
   document.documentElement.style.setProperty('--lyric-size',sz);
