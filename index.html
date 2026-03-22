@@ -302,19 +302,21 @@ const SEARCH_SUFFIX = ' 伴唱 karaoke';
 /* ════════════════════════════════════
    State
 ════════════════════════════════════ */
-let apiKey = '';
+// ★★★ 在這裡填入你的 YouTube Data API v3 金鑰 ★★★
+let apiKey = 'AIzaSyBwu5ewuV95FLUyh6ngAU3q1RJIcIVFLrU';
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+
 let queue = [];
 let favorites = [];
 let playHistory = [];
-let currentSong = null;  // { ytId, title, channel, thumbUrl, lyrics:[], lyricSec:[] }
+let currentSong = null;
 let ytPlayer = null;
 let ytReady = false;
 let pendingPlay = null;
 let syncTimer = null;
 let lastLyricIdx = -1;
-let searchResults = []; // keep last results for fav refresh
+let searchResults = [];
 
-try { apiKey = localStorage.getItem('ktv_apikey')||''; } catch(e){}
 try { favorites = JSON.parse(localStorage.getItem('ktv_fav6')||'[]'); } catch(e){}
 
 /* ════════════════════════════════════
@@ -324,10 +326,8 @@ renderArtistChips();
 renderFavList();
 renderQueueFull();
 renderQueuePreview();
-if (apiKey) {
-  document.getElementById('apikey-input').value = apiKey;
-  document.getElementById('apikey-box').style.borderColor = 'var(--gold)';
-}
+// 隱藏 API Key 輸入框（已內建在程式碼中）
+document.getElementById('apikey-box').style.display = 'none';
 
 /* ════════════════════════════════════
    YouTube IFrame API
