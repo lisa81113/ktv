@@ -20,163 +20,132 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); color: var(--text-bright); overflow-x: hidden; min-height: 100vh; }
 
-/* HEADER */
-.header {
-  background: linear-gradient(135deg, #2a0800, #5a1800);
-  border-bottom: 3px solid var(--gold);
-  padding: 12px 18px;
-  display: flex; align-items: center; justify-content: center;
-  position: sticky; top: 0; z-index: 200;
-  box-shadow: 0 3px 20px rgba(0,0,0,0.7);
-}
+.header { background: linear-gradient(135deg, #2a0800, #5a1800); border-bottom: 3px solid var(--gold); padding: 12px 18px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 200; box-shadow: 0 3px 20px rgba(0,0,0,0.7); }
 .header-title { font-size: 1.8rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px rgba(255,215,0,0.5); letter-spacing: 4px; }
 .header-title span { color: var(--accent); }
 
-/* TABS */
 .nav-tabs { display: flex; background: var(--bg-mid); border-bottom: 2px solid var(--gold-dark); position: sticky; top: 58px; z-index: 100; }
 .nav-tab { flex: 1; padding: 13px 4px; text-align: center; font-size: 0.92rem; font-weight: 700; color: var(--text-dim); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; user-select: none; }
 .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); background: rgba(255,215,0,0.07); }
 
-/* PANELS */
 .panel { display: none; }
 .panel.active { display: block; }
 
-/* ══ PLAY PANEL ══ */
+/* ── Player ── */
 .yt-container { width: 100%; background: #000; border-bottom: 3px solid var(--gold-dark); }
 .yt-ratio { position: relative; padding-top: 56.25%; background: #000; }
 .yt-ratio iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:none; }
-.yt-idle-overlay {
-  position: absolute; top:0; left:0; width:100%; height:100%;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: radial-gradient(ellipse at 40% 60%, #1a003a 0%, #000 65%);
-  gap: 12px; text-align: center; padding: 20px; z-index: 2;
-}
+.yt-idle-overlay { position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background: radial-gradient(ellipse at 40% 60%, #1a003a 0%, #000 65%); gap:12px; text-align:center; padding:20px; z-index:2; }
 .yt-idle-overlay .mic { font-size: 3.8rem; }
 .yt-idle-overlay .idle-txt { font-size: 1.05rem; color: var(--text-dim); line-height: 1.7; }
-.yt-error-overlay {
-  display: none; position: absolute; top:0; left:0; width:100%; height:100%;
-  flex-direction: column; align-items: center; justify-content: center;
-  background: rgba(0,0,0,0.92); gap: 10px; text-align: center; padding: 16px; z-index: 3;
-}
-.yt-error-overlay .err-icon { font-size: 2.2rem; }
-.yt-error-overlay .err-txt { font-size: 0.9rem; color: #ffaaaa; line-height: 1.6; }
-.yt-open-link { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg,#cc0000,#ff2222); color:white; font-size:0.95rem; font-weight:700; padding:10px 18px; border-radius:10px; border:none; cursor:pointer; font-family:inherit; text-decoration:none; margin-top:4px; }
+.yt-error-overlay { display:none; position:absolute; top:0; left:0; width:100%; height:100%; flex-direction:column; align-items:center; justify-content:center; background:rgba(0,0,0,0.92); gap:10px; text-align:center; padding:16px; z-index:3; }
+.yt-open-link { display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,#cc0000,#ff2222); color:white; font-size:0.95rem; font-weight:700; padding:10px 18px; border-radius:10px; border:none; cursor:pointer; font-family:inherit; text-decoration:none; }
 
-/* Now playing bar */
-.np-bar { display: none; background: var(--bg-card); border-bottom: 1px solid var(--gold-dark); padding: 9px 14px; align-items: center; gap: 10px; }
-.np-disc { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; background: conic-gradient(var(--gold), var(--accent), var(--gold-dark), var(--gold)); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; animation: spin 3s linear infinite; animation-play-state: paused; }
-.np-disc.spin { animation-play-state: running; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.np-bar { display:none; background:var(--bg-card); border-bottom:1px solid var(--gold-dark); padding:9px 14px; align-items:center; gap:10px; }
+.np-disc { width:40px; height:40px; border-radius:50%; flex-shrink:0; background:conic-gradient(var(--gold),var(--accent),var(--gold-dark),var(--gold)); display:flex; align-items:center; justify-content:center; font-size:1.1rem; animation:spin 3s linear infinite; animation-play-state:paused; }
+.np-disc.spin { animation-play-state:running; }
+@keyframes spin { to { transform:rotate(360deg); } }
 .np-info { flex:1; min-width:0; }
-.np-name { font-size: 0.95rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.np-sub { font-size: 0.8rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.np-time { font-size: 0.78rem; color: var(--text-dim); flex-shrink: 0; font-weight: 700; }
+.np-name { font-size:0.95rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.np-sub { font-size:0.78rem; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.np-time { font-size:0.78rem; color:var(--text-dim); flex-shrink:0; font-weight:700; }
 
-/* LYRIC BOX */
-.lyric-box { background: linear-gradient(180deg,#080200 0%,#150800 100%); padding: 15px 14px 11px; min-height: 135px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 2px solid var(--gold-dark); cursor: pointer; user-select: none; }
-.lyric-tap-hint { font-size: 0.68rem; color: rgba(255,255,255,0.16); margin-bottom: 3px; }
-.lyric-prev, .lyric-next { font-size: calc(var(--lyric-size)*0.5); color: rgba(255,255,255,0.22); line-height: 1.6; text-align: center; min-height: 1.5em; }
-.lyric-curr { font-size: var(--lyric-size); font-weight: 900; color: var(--gold); text-align: center; line-height: 1.4; text-shadow: 0 0 28px rgba(255,215,0,0.85),0 2px 8px rgba(0,0,0,0.9); margin: 7px 0; letter-spacing: 3px; min-height: 1.4em; }
-.lyric-progress { width: 90%; height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; margin-top: 9px; overflow: hidden; }
-.lyric-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--accent)); border-radius: 3px; transition: width 0.4s linear; }
-.lyric-counter { font-size: 0.68rem; color: rgba(255,255,255,0.18); margin-top: 4px; }
+.lyric-box { background:linear-gradient(180deg,#080200 0%,#150800 100%); padding:15px 14px 11px; min-height:135px; display:flex; flex-direction:column; align-items:center; justify-content:center; border-bottom:2px solid var(--gold-dark); cursor:pointer; user-select:none; }
+.lyric-tap-hint { font-size:0.68rem; color:rgba(255,255,255,0.16); margin-bottom:3px; }
+.lyric-prev,.lyric-next { font-size:calc(var(--lyric-size)*0.5); color:rgba(255,255,255,0.22); line-height:1.6; text-align:center; min-height:1.5em; }
+.lyric-curr { font-size:var(--lyric-size); font-weight:900; color:var(--gold); text-align:center; line-height:1.4; text-shadow:0 0 28px rgba(255,215,0,0.85),0 2px 8px rgba(0,0,0,0.9); margin:7px 0; letter-spacing:3px; min-height:1.4em; }
+.lyric-progress { width:90%; height:5px; background:rgba(255,255,255,0.08); border-radius:3px; margin-top:9px; overflow:hidden; }
+.lyric-fill { height:100%; background:linear-gradient(90deg,var(--gold),var(--accent)); border-radius:3px; transition:width 0.4s linear; }
+.lyric-counter { font-size:0.68rem; color:rgba(255,255,255,0.18); margin-top:4px; }
 
-/* CONTROLS */
-.controls-area { padding: 10px 12px; background: var(--bg-mid); }
-.ctrl-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 7px; margin-bottom: 9px; }
-.ctrl-btn { padding: 12px 4px; border: none; border-radius: 11px; font-family: inherit; font-weight: 700; font-size: 0.8rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; transition: all 0.15s; user-select: none; }
-.ctrl-btn:active { transform: scale(0.92); }
-.ctrl-btn .ci { font-size: 1.4rem; }
-.c-prev,.c-next { background: var(--bg-card); border: 1px solid var(--gold-dark); color: var(--gold); }
-.c-pp { background: linear-gradient(135deg,var(--gold),#d4940a); color: #1a0a00; }
-.c-stop { background: linear-gradient(135deg,#7a0000,#c0392b); color:#fff; }
+.controls-area { padding:10px 12px; background:var(--bg-mid); }
+.ctrl-row { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-bottom:9px; }
+.ctrl-btn { padding:12px 4px; border:none; border-radius:11px; font-family:inherit; font-weight:700; font-size:0.8rem; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; transition:all 0.15s; user-select:none; }
+.ctrl-btn:active { transform:scale(0.92); }
+.ctrl-btn .ci { font-size:1.4rem; }
+.c-prev,.c-next { background:var(--bg-card); border:1px solid var(--gold-dark); color:var(--gold); }
+.c-pp { background:linear-gradient(135deg,var(--gold),#d4940a); color:#1a0a00; }
+.c-stop { background:linear-gradient(135deg,#7a0000,#c0392b); color:#fff; }
 
-.setting-row { background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 11px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
-.setting-label { font-size: 0.85rem; color: var(--text-dim); flex-shrink: 0; }
-.opt-btns { display: flex; gap: 5px; flex-wrap: wrap; }
-.opt-btn { padding: 7px 11px; border-radius: 7px; border: 2px solid var(--gold-dark); background: transparent; color: var(--gold); font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit; user-select: none; }
-.opt-btn.active { background: var(--gold); color: #1a0a00; border-color: var(--gold); }
+.setting-row { background:var(--bg-card); border:1px solid var(--gold-dark); border-radius:11px; padding:10px 12px; display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+.setting-label { font-size:0.85rem; color:var(--text-dim); flex-shrink:0; }
+.opt-btns { display:flex; gap:5px; flex-wrap:wrap; }
+.opt-btn { padding:7px 11px; border-radius:7px; border:2px solid var(--gold-dark); background:transparent; color:var(--gold); font-size:0.85rem; font-weight:700; cursor:pointer; font-family:inherit; user-select:none; }
+.opt-btn.active { background:var(--gold); color:#1a0a00; border-color:var(--gold); }
 
-.section-title { font-size: 0.95rem; font-weight: 700; color: var(--gold); margin: 9px 0 7px; display: flex; align-items: center; gap: 7px; }
-.section-title::after { content:''; flex:1; height:1px; background: var(--gold-dark); }
+.section-title { font-size:0.95rem; font-weight:700; color:var(--gold); margin:9px 0 7px; display:flex; align-items:center; gap:7px; }
+.section-title::after { content:''; flex:1; height:1px; background:var(--gold-dark); }
 
-/* ══ SEARCH PANEL ══ */
-#panel-search, #panel-fav, #panel-queue { padding: 13px; }
+/* ── Search ── */
+#panel-search,#panel-fav,#panel-queue { padding:13px; }
+.search-row { display:flex; gap:8px; margin-bottom:10px; }
+.search-input { flex:1; padding:13px 12px; font-size:1.05rem; font-family:inherit; background:var(--bg-card); border:2px solid var(--gold-dark); border-radius:12px; color:var(--text-bright); outline:none; }
+.search-input:focus { border-color:var(--gold); }
+.search-input::placeholder { color:var(--text-dim); }
 
-.search-row { display: flex; gap: 8px; margin-bottom: 10px; }
-.search-input { flex: 1; padding: 13px 12px; font-size: 1.05rem; font-family: inherit; background: var(--bg-card); border: 2px solid var(--gold-dark); border-radius: 12px; color: var(--text-bright); outline: none; }
-.search-input:focus { border-color: var(--gold); }
-.search-input::placeholder { color: var(--text-dim); }
-.btn { padding: 13px 16px; font-size: 0.95rem; font-family: inherit; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; transition: all 0.15s; user-select: none; }
-.btn:active { transform: scale(0.94); }
-.btn-gold { background: linear-gradient(135deg,var(--gold),#d4940a); color: #1a0a00; }
-.btn-red { background: linear-gradient(135deg,#8b0000,#c0392b); color:#fff; }
+/* API Key 設定區 */
+.apikey-box { background:rgba(255,215,0,0.06); border:1px solid var(--gold-dark); border-radius:11px; padding:11px 13px; margin-bottom:12px; }
+.apikey-row { display:flex; gap:8px; align-items:center; }
+.apikey-input { flex:1; padding:10px 11px; font-size:0.9rem; font-family:inherit; background:var(--bg-dark); border:2px solid var(--gold-dark); border-radius:9px; color:var(--text-bright); outline:none; }
+.apikey-input:focus { border-color:var(--gold); }
+.apikey-hint { font-size:0.75rem; color:var(--text-dim); margin-top:6px; line-height:1.5; }
+.apikey-hint a { color:var(--gold); }
 
-.artist-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
-.artist-chip { padding: 8px 14px; background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 20px; font-size: 0.9rem; color: var(--text-dim); cursor: pointer; user-select: none; transition: all 0.15s; }
-.artist-chip.active { background: var(--gold); color: #1a0a00; font-weight: 700; border-color: var(--gold); }
+.btn { padding:11px 15px; font-size:0.92rem; font-family:inherit; font-weight:700; border:none; border-radius:11px; cursor:pointer; transition:all 0.15s; user-select:none; }
+.btn:active { transform:scale(0.94); }
+.btn-gold { background:linear-gradient(135deg,var(--gold),#d4940a); color:#1a0a00; }
+.btn-red { background:linear-gradient(135deg,#8b0000,#c0392b); color:#fff; }
+.btn-sm { padding:8px 12px; font-size:0.82rem; }
 
-/* Search results grid */
-.search-results-grid { display: flex; flex-direction: column; gap: 9px; }
-.search-result-card {
-  background: var(--bg-card); border: 1px solid var(--gold-dark);
-  border-radius: 13px; padding: 10px 12px;
-  display: flex; align-items: center; gap: 10px;
-  cursor: pointer; transition: all 0.15s;
-}
-.search-result-card:active { background: #3e2500; }
-.src-thumb {
-  width: 80px; height: 55px; object-fit: cover;
-  border-radius: 8px; flex-shrink: 0; background: #111;
-}
-.src-thumb-placeholder {
-  width: 80px; height: 55px; border-radius: 8px;
-  background: var(--bg-mid); display: flex; align-items: center; justify-content: center;
-  font-size: 1.5rem; flex-shrink: 0; border: 1px solid var(--gold-dark);
-}
-.src-info { flex: 1; min-width: 0; }
-.src-title { font-size: 0.95rem; font-weight: 700; line-height: 1.4; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.src-meta { font-size: 0.78rem; color: var(--text-dim); }
-.src-actions { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
-.icon-btn { width: 38px; height: 38px; border-radius: 50%; border: none; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; user-select: none; transition: all 0.15s; }
-.icon-btn:active { transform: scale(0.88); }
-.fav-btn { background: rgba(255,80,80,0.15); color: #ff7777; }
-.fav-btn.on { background: rgba(255,80,80,0.3); color: #ff2222; }
-.play-btn { background: rgba(255,215,0,0.15); color: var(--gold); }
-.add-btn { background: rgba(255,165,0,0.15); color: #ffa500; }
+.artist-chips { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px; }
+.artist-chip { padding:8px 14px; background:var(--bg-card); border:1px solid var(--gold-dark); border-radius:20px; font-size:0.9rem; color:var(--text-dim); cursor:pointer; user-select:none; transition:all 0.15s; }
+.artist-chip.active { background:var(--gold); color:#1a0a00; font-weight:700; border-color:var(--gold); }
 
-/* Loading spinner */
-.loading-box { display: none; text-align: center; padding: 30px 20px; }
-.spinner { width: 44px; height: 44px; border: 4px solid rgba(255,215,0,0.15); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
-.loading-txt { font-size: 0.95rem; color: var(--text-dim); }
+/* Search result cards */
+.results-grid { display:flex; flex-direction:column; gap:9px; }
+.result-card { background:var(--bg-card); border:1px solid var(--gold-dark); border-radius:13px; padding:10px 11px; display:flex; align-items:center; gap:10px; }
+.result-thumb { width:88px; height:56px; object-fit:cover; border-radius:7px; flex-shrink:0; background:#111; }
+.result-info { flex:1; min-width:0; cursor:pointer; }
+.result-title { font-size:0.9rem; font-weight:700; line-height:1.4; margin-bottom:3px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.result-channel { font-size:0.75rem; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.result-actions { display:flex; flex-direction:column; gap:5px; flex-shrink:0; }
+.icon-btn { width:38px; height:38px; border-radius:50%; border:none; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; user-select:none; transition:all 0.15s; }
+.icon-btn:active { transform:scale(0.88); }
+.fav-btn { background:rgba(255,80,80,0.15); color:#ff7777; }
+.fav-btn.on { background:rgba(255,80,80,0.3); color:#ff2222; }
+.play-btn { background:rgba(255,215,0,0.15); color:var(--gold); }
+.add-btn { background:rgba(255,165,0,0.15); color:#ffa500; }
 
-/* Queue */
-.queue-item { background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 11px; padding: 10px 12px; display: flex; align-items: center; gap: 9px; margin-bottom: 7px; }
-.q-num { width: 26px; height: 26px; background: var(--gold); color: #1a0a00; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.8rem; flex-shrink: 0; }
+.loading-box { display:none; text-align:center; padding:30px 20px; }
+.spinner { width:42px; height:42px; border:4px solid rgba(255,215,0,0.15); border-top-color:var(--gold); border-radius:50%; animation:spin 0.7s linear infinite; margin:0 auto 12px; }
+.loading-txt { font-size:0.9rem; color:var(--text-dim); }
 
-.empty-state { text-align: center; padding: 36px 20px; color: var(--text-dim); font-size: 0.95rem; }
-.empty-icon { font-size: 2.8rem; display: block; margin-bottom: 10px; }
+.empty-state { text-align:center; padding:30px 20px; color:var(--text-dim); font-size:0.92rem; }
+.empty-icon { font-size:2.6rem; display:block; margin-bottom:10px; }
 
 /* Fav list */
-.fav-item { background: var(--bg-card); border: 1px solid var(--gold-dark); border-radius: 13px; padding: 11px 12px; display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
-.fav-thumb { width: 60px; height: 42px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: #111; }
-.fav-info { flex: 1; min-width: 0; }
-.fav-title { font-size: 0.92rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.fav-meta { font-size: 0.76rem; color: var(--text-dim); }
+.fav-item { background:var(--bg-card); border:1px solid var(--gold-dark); border-radius:12px; padding:10px 12px; display:flex; align-items:center; gap:9px; margin-bottom:7px; }
+.fav-thumb { width:60px; height:42px; object-fit:cover; border-radius:6px; flex-shrink:0; background:#111; }
+.fav-info { flex:1; min-width:0; cursor:pointer; }
+.fav-title { font-size:0.9rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fav-channel { font-size:0.75rem; color:var(--text-dim); }
 
-/* Toast */
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(14px); background: rgba(255,215,0,0.97); color: #1a0a00; padding: 10px 20px; border-radius: 26px; font-size: 0.92rem; font-weight: 700; opacity: 0; transition: all 0.26s; z-index: 999; white-space: nowrap; pointer-events: none; box-shadow: 0 4px 18px rgba(0,0,0,0.5); }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+/* Queue */
+.queue-item { background:var(--bg-card); border:1px solid var(--gold-dark); border-radius:11px; padding:10px 12px; display:flex; align-items:center; gap:9px; margin-bottom:7px; }
+.q-num { width:26px; height:26px; background:var(--gold); color:#1a0a00; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:0.8rem; flex-shrink:0; }
 
-/* Lyric input modal */
-.modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 500; align-items: center; justify-content: center; padding: 20px; }
-.modal-backdrop.show { display: flex; }
-.modal-box { background: var(--bg-mid); border: 2px solid var(--gold-dark); border-radius: 16px; padding: 20px; width: 100%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
-.modal-title { font-size: 1.1rem; font-weight: 900; color: var(--gold); margin-bottom: 14px; }
-.modal-subtitle { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 8px; }
-.modal-textarea { width: 100%; min-height: 140px; background: var(--bg-card); border: 2px solid var(--gold-dark); border-radius: 10px; color: var(--text-bright); font-family: inherit; font-size: 1rem; padding: 10px; outline: none; resize: vertical; }
-.modal-textarea:focus { border-color: var(--gold); }
-.modal-row { display: flex; gap: 8px; margin-top: 12px; }
+/* Lyric modal */
+.modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:500; align-items:center; justify-content:center; padding:16px; }
+.modal-backdrop.show { display:flex; }
+.modal-box { background:var(--bg-mid); border:2px solid var(--gold-dark); border-radius:16px; padding:18px; width:100%; max-width:500px; max-height:82vh; overflow-y:auto; }
+.modal-title { font-size:1.05rem; font-weight:900; color:var(--gold); margin-bottom:10px; }
+.modal-hint { font-size:0.8rem; color:var(--text-dim); margin-bottom:8px; line-height:1.6; }
+.modal-textarea { width:100%; min-height:140px; background:var(--bg-card); border:2px solid var(--gold-dark); border-radius:9px; color:var(--text-bright); font-family:inherit; font-size:0.95rem; padding:10px; outline:none; resize:vertical; }
+.modal-textarea:focus { border-color:var(--gold); }
+.modal-row { display:flex; gap:8px; margin-top:11px; }
+
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(14px); background:rgba(255,215,0,0.97); color:#1a0a00; padding:10px 20px; border-radius:26px; font-size:0.92rem; font-weight:700; opacity:0; transition:all 0.26s; z-index:999; white-space:nowrap; pointer-events:none; box-shadow:0 4px 18px rgba(0,0,0,0.5); }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
@@ -201,8 +170,8 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
         <div class="idle-txt">到「搜尋」輸入歌手或歌名<br>找到歌曲後按 ▶ 開始唱！</div>
       </div>
       <div class="yt-error-overlay" id="yt-error">
-        <span class="err-icon">⚠️</span>
-        <div class="err-txt">此影片不支援嵌入播放<br>請點下方按鈕在 YouTube 開啟</div>
+        <div style="font-size:2rem;">⚠️</div>
+        <div style="font-size:0.9rem;color:#ffaaaa;line-height:1.6;">此影片不支援嵌入播放<br>請點下方在 YouTube 開啟</div>
         <a id="yt-fallback-link" class="yt-open-link" href="#" target="_blank">▶ 開啟 YouTube</a>
       </div>
       <div id="yt-player"></div>
@@ -218,7 +187,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
     <div class="np-time" id="np-time">0:00</div>
   </div>
 
-  <div class="lyric-box" onclick="manualNextLyric()" id="lyric-box">
+  <div class="lyric-box" onclick="manualNext()" id="lyric-box">
     <div class="lyric-tap-hint" id="lyric-tap-hint"></div>
     <div class="lyric-prev" id="lyric-prev"></div>
     <div class="lyric-curr" id="lyric-curr" style="color:var(--text-dim);font-size:1.3rem;">請先選一首歌 🎶</div>
@@ -232,13 +201,12 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
   <div class="controls-area">
     <div class="ctrl-row">
       <button class="ctrl-btn c-prev" onclick="playPrev()"><span class="ci">⏮</span>上一首</button>
-      <button class="ctrl-btn c-pp" id="pp-btn" onclick="togglePause()"><span class="ci" id="pp-icon">▶</span><span id="pp-label">播放</span></button>
+      <button class="ctrl-btn c-pp" onclick="togglePause()"><span class="ci" id="pp-icon">▶</span><span id="pp-label">播放</span></button>
       <button class="ctrl-btn c-next" onclick="playNext()"><span class="ci">⏭</span>下一首</button>
       <button class="ctrl-btn c-stop" onclick="stopSong()"><span class="ci">⏹</span>停止</button>
     </div>
 
-    <!-- 編輯歌詞 -->
-    <button class="btn btn-gold" id="edit-lyric-btn" onclick="openLyricModal()" style="width:100%;margin-bottom:9px;display:none;">✏️ 編輯歌詞時間點</button>
+    <button class="btn btn-gold" id="edit-lyric-btn" onclick="openLyricModal()" style="width:100%;margin-bottom:8px;display:none;">✏️ 編輯歌詞 / 時間點</button>
 
     <div class="setting-row">
       <span class="setting-label">🔤 歌詞大小</span>
@@ -257,7 +225,21 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
 
 <!-- ══ 搜尋 ══ -->
 <div class="panel" id="panel-search">
-  <div class="section-title">🔍 搜尋歌曲（由 mbplayer 提供）</div>
+
+  <!-- API Key 設定 -->
+  <div class="apikey-box" id="apikey-box">
+    <div style="font-size:0.88rem;font-weight:700;color:var(--gold);margin-bottom:7px;">🔑 YouTube API 金鑰設定</div>
+    <div class="apikey-row">
+      <input class="apikey-input" id="apikey-input" type="text" placeholder="貼上你的 YouTube Data API v3 金鑰...">
+      <button class="btn btn-gold btn-sm" onclick="saveApiKey()">儲存</button>
+    </div>
+    <div class="apikey-hint">
+      免費申請：<a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> → 建立專案 → 啟用 YouTube Data API v3 → 建立 API 金鑰<br>
+      每日免費額度：10,000 次查詢，個人使用完全夠用。
+    </div>
+  </div>
+
+  <div class="section-title">🔍 搜尋歌曲</div>
   <div class="search-row">
     <input class="search-input" id="search-input" type="text" placeholder="輸入歌手名稱或歌曲名稱...">
     <button class="btn btn-gold" onclick="doSearch()">搜尋</button>
@@ -266,14 +248,13 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
   <div class="section-title">🎤 快速選歌手</div>
   <div class="artist-chips" id="artist-chips"></div>
 
-  <!-- Loading -->
   <div class="loading-box" id="loading-box">
     <div class="spinner"></div>
     <div class="loading-txt" id="loading-txt">搜尋中...</div>
   </div>
 
   <div class="section-title" id="results-title" style="display:none">🎵 搜尋結果</div>
-  <div class="search-results-grid" id="search-results"></div>
+  <div class="results-grid" id="search-results"></div>
 </div>
 
 <!-- ══ 最愛 ══ -->
@@ -286,17 +267,21 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
 <div class="panel" id="panel-queue">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
     <div class="section-title" style="margin:0;flex:1;">📋 點歌列表</div>
-    <button class="btn btn-red" onclick="clearQueue()" style="padding:9px 13px;font-size:0.85rem;">清空</button>
+    <button class="btn btn-red" onclick="clearQueue()" style="padding:8px 12px;font-size:0.82rem;">清空</button>
   </div>
   <div id="queue-full-list"></div>
 </div>
 
-<!-- ══ 歌詞編輯 Modal ══ -->
+<!-- ══ 歌詞 Modal ══ -->
 <div class="modal-backdrop" id="lyric-modal">
   <div class="modal-box">
-    <div class="modal-title">✏️ 編輯歌詞</div>
-    <div class="modal-subtitle">每行一句歌詞，格式：<b style="color:var(--gold)">秒數|歌詞</b><br>例如：<code style="color:#adf">12|愛拼才會贏</code></div>
-    <textarea class="modal-textarea" id="lyric-textarea" placeholder="12|第一句歌詞&#10;18|第二句歌詞&#10;24|第三句歌詞"></textarea>
+    <div class="modal-title">✏️ 編輯歌詞 &amp; 時間點</div>
+    <div class="modal-hint">
+      格式：<b style="color:var(--gold)">秒數 | 歌詞</b>，每行一句<br>
+      例：<code style="color:#adf">12 | 愛拼才會贏</code><br>
+      💡 播放時注意影片秒數，對應填入即可同步！
+    </div>
+    <textarea class="modal-textarea" id="lyric-textarea"></textarea>
     <div class="modal-row">
       <button class="btn btn-gold" onclick="saveLyric()" style="flex:1;">✅ 儲存</button>
       <button class="btn" onclick="closeLyricModal()" style="flex:1;background:var(--bg-card);border:1px solid var(--gold-dark);color:var(--gold);">取消</button>
@@ -307,34 +292,46 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); colo
 <div class="toast" id="toast"></div>
 
 <script>
-/* ═══════════════════════════════════════════
-   資料結構
-═══════════════════════════════════════════ */
-// 每首播放中的歌曲格式：
-// { ytId, title, thumbUrl, lyrics:[], lyricSec:[] }
-
+/* ════════════════════════════════════
+   設定
+════════════════════════════════════ */
 const ARTISTS = ['劉歡','潘美辰','林良樂','余天','蘇芮','張惠妹','鄭怡','鳳飛飛','鄧麗君','葉啟田'];
+// 搜尋時自動加上的關鍵字，讓結果偏向伴唱帶
+const SEARCH_SUFFIX = ' 伴唱 karaoke';
 
-// CORS Proxy — 用來繞過瀏覽器的跨域限制
-const PROXY = 'https://api.allorigins.win/get?url=';
-
-/* ── State ── */
+/* ════════════════════════════════════
+   State
+════════════════════════════════════ */
+let apiKey = '';
 let queue = [];
-let favorites = []; // [{ ytId, title, thumbUrl }]
-let history = [];   // 最近播放
-let currentSong = null; // { ytId, title, thumbUrl, lyrics, lyricSec }
+let favorites = [];
+let playHistory = [];
+let currentSong = null;  // { ytId, title, channel, thumbUrl, lyrics:[], lyricSec:[] }
 let ytPlayer = null;
 let ytReady = false;
 let pendingPlay = null;
 let syncTimer = null;
 let lastLyricIdx = -1;
+let searchResults = []; // keep last results for fav refresh
 
-try { favorites = JSON.parse(localStorage.getItem('ktv_fav5')||'[]'); } catch(e){}
-try { history = JSON.parse(localStorage.getItem('ktv_hist')||'[]'); } catch(e){}
+try { apiKey = localStorage.getItem('ktv_apikey')||''; } catch(e){}
+try { favorites = JSON.parse(localStorage.getItem('ktv_fav6')||'[]'); } catch(e){}
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════
+   Init
+════════════════════════════════════ */
+renderArtistChips();
+renderFavList();
+renderQueueFull();
+renderQueuePreview();
+if (apiKey) {
+  document.getElementById('apikey-input').value = apiKey;
+  document.getElementById('apikey-box').style.borderColor = 'var(--gold)';
+}
+
+/* ════════════════════════════════════
    YouTube IFrame API
-═══════════════════════════════════════════ */
+════════════════════════════════════ */
 (function(){
   const s = document.createElement('script');
   s.src = 'https://www.youtube.com/iframe_api';
@@ -347,413 +344,356 @@ window.onYouTubeIframeAPIReady = function() {
     height:'100%', width:'100%', videoId:'',
     playerVars:{ autoplay:0, controls:1, rel:0, playsinline:1, modestbranding:1 },
     events:{
-      onReady: e => { if(pendingPlay){ loadAndPlay(pendingPlay); pendingPlay=null; } },
-      onStateChange: onStateChange,
-      onError: e => showEmbedError()
+      onReady: () => { if(pendingPlay){ doLoad(pendingPlay); pendingPlay=null; } },
+      onStateChange: onYTState,
+      onError: () => showEmbedError()
     }
   });
 };
 
-function onStateChange(e) {
-  if (e.data === YT.PlayerState.PLAYING) {
-    document.getElementById('pp-icon').textContent = '⏸';
-    document.getElementById('pp-label').textContent = '暫停';
+function onYTState(e) {
+  if (e.data===YT.PlayerState.PLAYING) {
+    document.getElementById('pp-icon').textContent='⏸';
+    document.getElementById('pp-label').textContent='暫停';
     document.getElementById('np-disc').classList.add('spin');
-    document.getElementById('yt-error').style.display = 'none';
-    startSyncTimer();
-  } else if (e.data === YT.PlayerState.PAUSED) {
-    document.getElementById('pp-icon').textContent = '▶';
-    document.getElementById('pp-label').textContent = '播放';
+    document.getElementById('yt-error').style.display='none';
+    startSync();
+  } else if (e.data===YT.PlayerState.PAUSED) {
+    document.getElementById('pp-icon').textContent='▶';
+    document.getElementById('pp-label').textContent='播放';
     document.getElementById('np-disc').classList.remove('spin');
-  } else if (e.data === YT.PlayerState.ENDED) {
+  } else if (e.data===YT.PlayerState.ENDED) {
     document.getElementById('np-disc').classList.remove('spin');
-    stopSyncTimer();
+    stopSync();
     setTimeout(playNext, 1200);
   }
 }
 
 function showEmbedError() {
   if (!currentSong) return;
-  const err = document.getElementById('yt-error');
-  err.style.display = 'flex';
-  document.getElementById('yt-fallback-link').href = 'https://www.youtube.com/watch?v=' + currentSong.ytId;
-  stopSyncTimer();
+  document.getElementById('yt-error').style.display='flex';
+  document.getElementById('yt-fallback-link').href='https://www.youtube.com/watch?v='+currentSong.ytId;
+  stopSync();
 }
 
-/* ═══════════════════════════════════════════
-   mbplayer 搜尋 + 解析
-═══════════════════════════════════════════ */
+/* ════════════════════════════════════
+   YouTube Data API v3 搜尋
+════════════════════════════════════ */
+function saveApiKey() {
+  const k = document.getElementById('apikey-input').value.trim();
+  if (!k) { showToast('請輸入 API 金鑰'); return; }
+  apiKey = k;
+  try{ localStorage.setItem('ktv_apikey', k); }catch(e){}
+  document.getElementById('apikey-box').style.borderColor='var(--gold)';
+  showToast('✅ API 金鑰已儲存！');
+}
+
 async function doSearch() {
   const q = document.getElementById('search-input').value.trim();
   if (!q) { showToast('請輸入歌手或歌名'); return; }
 
-  // UI: show loading
-  document.getElementById('loading-box').style.display = 'block';
-  document.getElementById('loading-txt').textContent = '搜尋「' + q + '」中...';
-  document.getElementById('search-results').innerHTML = '';
-  document.getElementById('results-title').style.display = 'none';
-  document.querySelectorAll('.artist-chip').forEach(c => c.classList.remove('active'));
+  if (!apiKey) {
+    document.getElementById('search-results').innerHTML =
+      `<div class="empty-state"><span class="empty-icon">🔑</span>請先在上方設定 YouTube API 金鑰<br><small style="color:#888">申請免費金鑰只需 3 分鐘</small></div>`;
+    document.getElementById('results-title').style.display='flex';
+    return;
+  }
+
+  // Show loading
+  document.getElementById('loading-box').style.display='block';
+  document.getElementById('loading-txt').textContent='搜尋「'+q+'」中...';
+  document.getElementById('search-results').innerHTML='';
+  document.getElementById('results-title').style.display='none';
 
   try {
-    const mbUrl = 'https://www.mbplayer.com/search?q=' + encodeURIComponent(q);
-    const proxyUrl = PROXY + encodeURIComponent(mbUrl);
-    const resp = await fetch(proxyUrl);
+    const query = encodeURIComponent(q + SEARCH_SUFFIX);
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&type=video&maxResults=10&key=${apiKey}&regionCode=TW&relevanceLanguage=zh-Hant`;
+    const resp = await fetch(url);
     const data = await resp.json();
-    const html = data.contents;
 
-    const results = parseMbplayerResults(html);
+    document.getElementById('loading-box').style.display='none';
 
-    document.getElementById('loading-box').style.display = 'none';
-
-    if (!results.length) {
+    if (data.error) {
       document.getElementById('search-results').innerHTML =
-        '<div class="empty-state"><span class="empty-icon">😔</span>找不到相關歌曲<br>試試其他關鍵字</div>';
+        `<div class="empty-state"><span class="empty-icon">⚠️</span>${data.error.message}</div>`;
+      document.getElementById('results-title').style.display='flex';
+      return;
+    }
+
+    const items = data.items || [];
+    searchResults = items.map(item => ({
+      ytId: item.id.videoId,
+      title: decodeHTML(item.snippet.title),
+      channel: item.snippet.channelTitle,
+      thumbUrl: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url || ''
+    }));
+
+    document.getElementById('results-title').style.display='flex';
+    if (!searchResults.length) {
+      document.getElementById('search-results').innerHTML =
+        '<div class="empty-state"><span class="empty-icon">😔</span>找不到相關歌曲</div>';
     } else {
-      document.getElementById('results-title').style.display = 'flex';
-      renderSearchResults(results);
+      renderResults(searchResults);
     }
   } catch(err) {
-    document.getElementById('loading-box').style.display = 'none';
+    document.getElementById('loading-box').style.display='none';
     document.getElementById('search-results').innerHTML =
-      '<div class="empty-state"><span class="empty-icon">⚠️</span>搜尋失敗，請檢查網路連線<br><small style="color:#888">'+err.message+'</small></div>';
+      `<div class="empty-state"><span class="empty-icon">⚠️</span>搜尋失敗<br><small style="color:#888">${err.message}</small></div>`;
+    document.getElementById('results-title').style.display='flex';
   }
 }
 
-function parseMbplayerResults(html) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-  const results = [];
-
-  // gs-title = Google Custom Search 結果連結
-  const titleEls = doc.querySelectorAll('a.gs-title');
-  const imageEls = doc.querySelectorAll('img.gs-image');
-
-  titleEls.forEach((el, i) => {
-    const href = el.getAttribute('href') || el.href || '';
-    if (!href || !href.includes('youtube.com') && !href.includes('youtu.be')) return;
-
-    // Extract YouTube video ID
-    const ytId = extractYtId(href);
-    if (!ytId) return;
-
-    // Get title text
-    const titleText = el.textContent.trim() || el.getAttribute('data-ctorig') || '';
-
-    // Get thumbnail
-    let thumbUrl = '';
-    if (imageEls[i]) {
-      thumbUrl = imageEls[i].getAttribute('src') || '';
-      // fix protocol-relative URLs
-      if (thumbUrl.startsWith('//')) thumbUrl = 'https:' + thumbUrl;
-    }
-    // Fallback to YouTube thumbnail
-    if (!thumbUrl) thumbUrl = 'https://img.youtube.com/vi/' + ytId + '/mqdefault.jpg';
-
-    results.push({ ytId, title: titleText, thumbUrl });
-  });
-
-  return results;
+function decodeHTML(html) {
+  const el = document.createElement('textarea');
+  el.innerHTML = html;
+  return el.value;
 }
 
-function extractYtId(url) {
-  // Standard: youtube.com/watch?v=ID
-  let m = url.match(/[?&]v=([A-Za-z0-9_-]{11})/);
-  if (m) return m[1];
-  // Short: youtu.be/ID
-  m = url.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
-  if (m) return m[1];
-  // Embed: youtube.com/embed/ID
-  m = url.match(/embed\/([A-Za-z0-9_-]{11})/);
-  if (m) return m[1];
-  return null;
-}
-
-function renderSearchResults(results) {
-  const el = document.getElementById('search-results');
-  el.innerHTML = results.map((r, i) => {
-    const isFav = favorites.some(f => f.ytId === r.ytId);
-    return `<div class="search-result-card">
-      <img class="src-thumb" src="${r.thumbUrl}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" loading="lazy">
-      <div class="src-thumb-placeholder" style="display:none">🎵</div>
-      <div class="src-info" onclick='playFromSearch(${JSON.stringify(r).replace(/'/g,"&#39;")})'>
-        <div class="src-title">${r.title || '（無標題）'}</div>
-        <div class="src-meta">YouTube · ${r.ytId}</div>
+function renderResults(items) {
+  document.getElementById('search-results').innerHTML = items.map(r => {
+    const isFav = favorites.some(f=>f.ytId===r.ytId);
+    const rJson = JSON.stringify(r).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<div class="result-card">
+      <img class="result-thumb" src="${r.thumbUrl}" loading="lazy" onerror="this.style.opacity=0">
+      <div class="result-info" onclick='playSong(${JSON.stringify(r)})'>
+        <div class="result-title">${r.title}</div>
+        <div class="result-channel">${r.channel}</div>
       </div>
-      <div class="src-actions">
-        <button class="icon-btn fav-btn ${isFav?'on':''}" onclick='toggleFavSearch(${JSON.stringify(r).replace(/'/g,"&#39;")})'>${isFav?'❤️':'🤍'}</button>
-        <button class="icon-btn add-btn" onclick='addToQueueSearch(${JSON.stringify(r).replace(/'/g,"&#39;")})'>➕</button>
-        <button class="icon-btn play-btn" onclick='playFromSearch(${JSON.stringify(r).replace(/'/g,"&#39;")})'>▶</button>
+      <div class="result-actions">
+        <button class="icon-btn fav-btn ${isFav?'on':''}" onclick='toggleFav(${JSON.stringify(r)})'>${isFav?'❤️':'🤍'}</button>
+        <button class="icon-btn add-btn" onclick='addQueue(${JSON.stringify(r)})'>➕</button>
+        <button class="icon-btn play-btn" onclick='playSong(${JSON.stringify(r)})'>▶</button>
       </div>
     </div>`;
   }).join('');
 }
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════
    Play
-═══════════════════════════════════════════ */
-function playFromSearch(song) {
-  // song = { ytId, title, thumbUrl }
-  // Add default empty lyrics (user can edit)
+════════════════════════════════════ */
+function playSong(song) {
   if (!song.lyrics) song.lyrics = [];
   if (!song.lyricSec) song.lyricSec = [];
-  playSong(song);
-}
-
-function playSong(song) {
   currentSong = song;
   lastLyricIdx = -1;
-  stopSyncTimer();
+  stopSync();
 
-  // Save to history
-  history = [song, ...history.filter(h=>h.ytId!==song.ytId)].slice(0,20);
-  try{localStorage.setItem('ktv_hist',JSON.stringify(history));}catch(e){}
-
-  // Update UI
-  document.getElementById('np-bar').style.display = 'flex';
-  document.getElementById('np-name').textContent = song.title || '（無標題）';
-  document.getElementById('np-sub').textContent = song.ytId;
+  // Update now-playing bar
+  document.getElementById('np-bar').style.display='flex';
+  document.getElementById('np-name').textContent = song.title||'（無標題）';
+  document.getElementById('np-sub').textContent = song.channel||song.ytId;
+  document.getElementById('yt-idle').style.display='none';
+  document.getElementById('yt-error').style.display='none';
+  document.getElementById('edit-lyric-btn').style.display='block';
   document.getElementById('lyric-progress').style.display = song.lyrics.length ? 'block' : 'none';
-  document.getElementById('lyric-tap-hint').textContent = song.lyrics.length ? '👆 點擊可手動換行' : '👆 點擊此處手動輸入歌詞';
-  document.getElementById('yt-idle').style.display = 'none';
-  document.getElementById('yt-error').style.display = 'none';
-  document.getElementById('edit-lyric-btn').style.display = 'block';
-  document.getElementById('pp-icon').textContent = '⏸';
-  document.getElementById('pp-label').textContent = '暫停';
+  document.getElementById('lyric-tap-hint').textContent = song.lyrics.length ? '👆 點擊可手動換行' : '👆 點擊此處新增歌詞';
 
   if (song.lyrics.length) renderLyricAt(0);
   else {
-    const curr = document.getElementById('lyric-curr');
-    curr.textContent = '🎤 無歌詞 — 按「✏️ 編輯歌詞」輸入';
-    curr.style.color = 'var(--text-dim)'; curr.style.fontSize = '1.1rem';
-    document.getElementById('lyric-prev').textContent = '';
-    document.getElementById('lyric-next').textContent = '';
+    const c=document.getElementById('lyric-curr');
+    c.textContent='🎤 無歌詞 — 按「✏️ 編輯歌詞」輸入';
+    c.style.color='var(--text-dim)'; c.style.fontSize='1.1rem';
+    document.getElementById('lyric-prev').textContent='';
+    document.getElementById('lyric-next').textContent='';
   }
 
-  if (!ytReady || !ytPlayer) { pendingPlay = song; return; }
-  loadAndPlay(song);
+  if (!ytReady||!ytPlayer) { pendingPlay=song; return; }
+  doLoad(song);
   switchTab('play');
-  showToast('🎵 ' + (song.title||'播放中'));
+  showToast('🎵 '+( song.title||'播放中'));
 }
 
-function loadAndPlay(song) {
-  document.getElementById('yt-error').style.display = 'none';
+function doLoad(song) {
+  document.getElementById('yt-error').style.display='none';
   ytPlayer.loadVideoById({ videoId: song.ytId });
 }
 
-/* ── Lyric sync ── */
-function startSyncTimer() {
-  stopSyncTimer();
+/* ── Sync ── */
+function startSync() {
+  stopSync();
   syncTimer = setInterval(() => {
-    if (!currentSong || !ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+    if (!currentSong||!ytPlayer||typeof ytPlayer.getCurrentTime!=='function') return;
     const sec = ytPlayer.getCurrentTime();
-    document.getElementById('np-time').textContent = formatTime(sec);
-    if (!currentSong.lyricSec || !currentSong.lyricSec.length) return;
-    let idx = 0;
-    for (let i = 0; i < currentSong.lyricSec.length; i++) {
-      if (sec >= currentSong.lyricSec[i]) idx = i; else break;
+    document.getElementById('np-time').textContent = fmtTime(sec);
+    if (!currentSong.lyricSec||!currentSong.lyricSec.length) return;
+    let idx=0;
+    for (let i=0;i<currentSong.lyricSec.length;i++){
+      if(sec>=currentSong.lyricSec[i]) idx=i; else break;
     }
-    if (idx !== lastLyricIdx) { lastLyricIdx = idx; renderLyricAt(idx); }
+    if(idx!==lastLyricIdx){ lastLyricIdx=idx; renderLyricAt(idx); }
   }, 200);
 }
-function stopSyncTimer() { if(syncTimer){clearInterval(syncTimer);syncTimer=null;} }
+function stopSync(){if(syncTimer){clearInterval(syncTimer);syncTimer=null;}}
 
 function renderLyricAt(idx) {
-  if (!currentSong || !currentSong.lyrics.length) return;
-  const L = currentSong.lyrics;
-  const i = Math.min(idx, L.length-1);
-  document.getElementById('lyric-prev').textContent = i>0 ? L[i-1] : '';
-  const curr = document.getElementById('lyric-curr');
-  curr.textContent = L[i]||'';
-  curr.style.color = 'var(--gold)'; curr.style.fontSize = 'var(--lyric-size)';
-  document.getElementById('lyric-next').textContent = i<L.length-1 ? L[i+1] : '';
-  document.getElementById('lyric-fill').style.width = Math.round(((i+1)/L.length)*100)+'%';
-  document.getElementById('lyric-counter').textContent = (i+1)+' / '+L.length+' 句';
+  if(!currentSong||!currentSong.lyrics.length) return;
+  const L=currentSong.lyrics;
+  const i=Math.min(idx,L.length-1);
+  document.getElementById('lyric-prev').textContent=i>0?L[i-1]:'';
+  const c=document.getElementById('lyric-curr');
+  c.textContent=L[i]||''; c.style.color='var(--gold)'; c.style.fontSize='var(--lyric-size)';
+  document.getElementById('lyric-next').textContent=i<L.length-1?L[i+1]:'';
+  document.getElementById('lyric-fill').style.width=Math.round(((i+1)/L.length)*100)+'%';
+  document.getElementById('lyric-counter').textContent=(i+1)+' / '+L.length+' 句';
 }
 
-function manualNextLyric() {
-  if (!currentSong) {
-    openLyricModal(); return;
-  }
-  if (!currentSong.lyrics.length) { openLyricModal(); return; }
-  const next = Math.min(lastLyricIdx+1, currentSong.lyrics.length-1);
-  lastLyricIdx = next;
-  renderLyricAt(next);
+function manualNext() {
+  if(!currentSong||!currentSong.lyrics.length){ openLyricModal(); return; }
+  const n=Math.min(lastLyricIdx+1,currentSong.lyrics.length-1);
+  lastLyricIdx=n; renderLyricAt(n);
 }
 
 function togglePause() {
-  if (!currentSong||!ytPlayer) { showToast('請先選一首歌！'); return; }
-  const s = ytPlayer.getPlayerState();
-  if (s===YT.PlayerState.PLAYING) ytPlayer.pauseVideo();
-  else ytPlayer.playVideo();
+  if(!currentSong||!ytPlayer){ showToast('請先選一首歌！'); return; }
+  const s=ytPlayer.getPlayerState();
+  if(s===YT.PlayerState.PLAYING) ytPlayer.pauseVideo(); else ytPlayer.playVideo();
 }
 
 function stopSong() {
-  stopSyncTimer();
-  if (ytPlayer&&typeof ytPlayer.stopVideo==='function') { try{ytPlayer.stopVideo();}catch(e){} }
+  stopSync();
+  if(ytPlayer&&typeof ytPlayer.stopVideo==='function'){try{ytPlayer.stopVideo();}catch(e){}}
   currentSong=null; lastLyricIdx=-1;
   document.getElementById('np-bar').style.display='none';
   document.getElementById('np-disc').classList.remove('spin');
   document.getElementById('np-time').textContent='0:00';
   document.getElementById('yt-idle').style.display='flex';
   document.getElementById('yt-error').style.display='none';
-  document.getElementById('lyric-prev').textContent='';
-  const curr=document.getElementById('lyric-curr');
-  curr.textContent='請先選一首歌 🎶'; curr.style.color='var(--text-dim)'; curr.style.fontSize='1.3rem';
-  document.getElementById('lyric-next').textContent='';
+  ['lyric-prev','lyric-next','lyric-counter'].forEach(id=>document.getElementById(id).textContent='');
+  const c=document.getElementById('lyric-curr');
+  c.textContent='請先選一首歌 🎶'; c.style.color='var(--text-dim)'; c.style.fontSize='1.3rem';
   document.getElementById('lyric-fill').style.width='0%';
-  document.getElementById('lyric-counter').textContent='';
   document.getElementById('lyric-progress').style.display='none';
   document.getElementById('lyric-tap-hint').textContent='';
-  document.getElementById('pp-icon').textContent='▶'; document.getElementById('pp-label').textContent='播放';
   document.getElementById('edit-lyric-btn').style.display='none';
+  document.getElementById('pp-icon').textContent='▶'; document.getElementById('pp-label').textContent='播放';
   showToast('⏹ 已停止');
 }
 
 function playNext() {
-  if (queue.length>0) { const n=queue.shift(); renderQueueFull(); renderQueuePreview(); playSong(n); }
-  else if (history.length>1) { playSong(history[1]); }
+  if(queue.length>0){ const n=queue.shift(); renderQueueFull(); renderQueuePreview(); playSong(n); }
 }
-function playPrev() {
-  if (history.length>1) playSong(history[1]);
-}
+function playPrev() { showToast('請從搜尋或最愛選擇歌曲'); }
 
-function formatTime(sec) {
-  sec=Math.floor(sec);
-  return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');
-}
+function fmtTime(s){ s=Math.floor(s); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
 
-/* ═══════════════════════════════════════════
-   歌詞編輯 Modal
-═══════════════════════════════════════════ */
+/* ════════════════════════════════════
+   歌詞 Modal
+════════════════════════════════════ */
 function openLyricModal() {
-  if (!currentSong) { showToast('請先選一首歌！'); return; }
-  const ta = document.getElementById('lyric-textarea');
-  if (currentSong.lyrics && currentSong.lyrics.length) {
-    ta.value = currentSong.lyrics.map((l,i) => (currentSong.lyricSec[i]||0)+' | '+l).join('\n');
-  } else {
-    ta.value = '5 | 第一句歌詞\n10 | 第二句歌詞\n16 | 第三句歌詞';
-  }
+  if(!currentSong){ showToast('請先選一首歌！'); return; }
+  const ta=document.getElementById('lyric-textarea');
+  ta.value = currentSong.lyrics.length
+    ? currentSong.lyrics.map((l,i)=>(currentSong.lyricSec[i]||0)+' | '+l).join('\n')
+    : '12 | 第一句歌詞\n18 | 第二句歌詞\n24 | 第三句歌詞';
   document.getElementById('lyric-modal').classList.add('show');
 }
-function closeLyricModal() {
-  document.getElementById('lyric-modal').classList.remove('show');
-}
+function closeLyricModal(){ document.getElementById('lyric-modal').classList.remove('show'); }
 function saveLyric() {
-  const lines = document.getElementById('lyric-textarea').value.trim().split('\n').filter(l=>l.trim());
-  const lyrics = []; const lyricSec = [];
-  for (const line of lines) {
-    const sep = line.includes('|') ? '|' : line.includes('：') ? '：' : null;
-    if (sep) {
-      const parts = line.split(sep);
-      const sec = parseFloat(parts[0].trim());
-      const text = parts.slice(1).join(sep).trim();
-      if (!isNaN(sec) && text) { lyricSec.push(sec); lyrics.push(text); }
-    } else if (line.trim()) {
+  const lines=document.getElementById('lyric-textarea').value.trim().split('\n').filter(l=>l.trim());
+  const lyrics=[]; const lyricSec=[];
+  for(const line of lines){
+    if(line.includes('|')){
+      const p=line.split('|');
+      const s=parseFloat(p[0].trim());
+      const t=p.slice(1).join('|').trim();
+      if(!isNaN(s)&&t){ lyricSec.push(s); lyrics.push(t); }
+    } else if(line.trim()){
       lyricSec.push(lyricSec.length ? lyricSec[lyricSec.length-1]+3 : 5);
       lyrics.push(line.trim());
     }
   }
-  currentSong.lyrics = lyrics;
-  currentSong.lyricSec = lyricSec;
-  lastLyricIdx = -1;
-  document.getElementById('lyric-progress').style.display = lyrics.length ? 'block' : 'none';
-  document.getElementById('lyric-tap-hint').textContent = lyrics.length ? '👆 點擊可手動換行' : '👆 點擊此處手動輸入歌詞';
-  if (lyrics.length) renderLyricAt(0);
-  // Update in queue/fav
-  queue = queue.map(q=>q.ytId===currentSong.ytId ? {...q,lyrics,lyricSec} : q);
-  favorites = favorites.map(f=>f.ytId===currentSong.ytId ? {...f,lyrics,lyricSec} : f);
-  try{localStorage.setItem('ktv_fav5',JSON.stringify(favorites));}catch(e){}
+  currentSong.lyrics=lyrics; currentSong.lyricSec=lyricSec;
+  lastLyricIdx=-1;
+  document.getElementById('lyric-progress').style.display=lyrics.length?'block':'none';
+  if(lyrics.length) renderLyricAt(0);
+  // sync back to fav/queue
+  favorites=favorites.map(f=>f.ytId===currentSong.ytId?{...f,lyrics,lyricSec}:f);
+  queue=queue.map(q=>q.ytId===currentSong.ytId?{...q,lyrics,lyricSec}:q);
+  try{localStorage.setItem('ktv_fav6',JSON.stringify(favorites));}catch(e){}
   closeLyricModal();
-  showToast('✅ 歌詞已儲存！');
+  showToast('✅ 歌詞已儲存！共 '+lyrics.length+' 句');
 }
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════
    Favorites & Queue
-═══════════════════════════════════════════ */
-function toggleFavSearch(song) {
-  const idx = favorites.findIndex(f=>f.ytId===song.ytId);
-  if (idx>=0) { favorites.splice(idx,1); showToast('已移除最愛'); }
-  else { favorites.push(song); showToast('❤️ 已加入最愛！'); }
-  try{localStorage.setItem('ktv_fav5',JSON.stringify(favorites));}catch(e){}
+════════════════════════════════════ */
+function toggleFav(song) {
+  const idx=favorites.findIndex(f=>f.ytId===song.ytId);
+  if(idx>=0){ favorites.splice(idx,1); showToast('已移除最愛'); }
+  else{ favorites.push(song); showToast('❤️ 已加入最愛！'); }
+  try{localStorage.setItem('ktv_fav6',JSON.stringify(favorites));}catch(e){}
   renderFavList();
-  // refresh search results to update heart icon
-  const q = document.getElementById('search-input').value.trim();
-  if (q) doSearch();
+  if(searchResults.length) renderResults(searchResults);
 }
-function addToQueueSearch(song) {
-  if (queue.find(s=>s.ytId===song.ytId)) { showToast('已在點歌列表中'); return; }
+function addQueue(song) {
+  if(queue.find(s=>s.ytId===song.ytId)){ showToast('已在點歌列表中'); return; }
   queue.push(song); renderQueueFull(); renderQueuePreview();
   showToast('➕ 已加入點歌');
 }
-function removeQueue(i) { queue.splice(i,1); renderQueueFull(); renderQueuePreview(); }
-function clearQueue() { queue=[]; renderQueueFull(); renderQueuePreview(); showToast('已清空點歌列表'); }
+function removeQueue(i){ queue.splice(i,1); renderQueueFull(); renderQueuePreview(); }
+function clearQueue(){ queue=[]; renderQueueFull(); renderQueuePreview(); showToast('已清空點歌列表'); }
 
 function renderFavList() {
-  const el = document.getElementById('fav-list');
-  if (!favorites.length) {
-    el.innerHTML = '<div class="empty-state"><span class="empty-icon">💝</span>還沒有最愛歌曲<br>按搜尋結果旁的 🤍 加入！</div>';
-    return;
-  }
-  el.innerHTML = favorites.map(f => {
-    const isNP = currentSong && currentSong.ytId === f.ytId;
+  const el=document.getElementById('fav-list');
+  if(!favorites.length){ el.innerHTML='<div class="empty-state"><span class="empty-icon">💝</span>還沒有最愛歌曲<br>搜尋後按 🤍 加入！</div>'; return; }
+  el.innerHTML=favorites.map(f=>{
+    const isNP=currentSong&&currentSong.ytId===f.ytId;
     return `<div class="fav-item">
-      <img class="fav-thumb" src="${f.thumbUrl||'https://img.youtube.com/vi/'+f.ytId+'/mqdefault.jpg'}" onerror="this.src=''" loading="lazy">
-      <div class="fav-info" onclick='playSong(${JSON.stringify(f).replace(/'/g,"&#39;")})' style="cursor:pointer;">
+      <img class="fav-thumb" src="${f.thumbUrl||''}" onerror="this.style.opacity=0" loading="lazy">
+      <div class="fav-info" onclick='playSong(${JSON.stringify(f)})'>
         <div class="fav-title" style="${isNP?'color:var(--gold)':''}">${isNP?'🎵 ':''  }${f.title||f.ytId}</div>
-        <div class="fav-meta">YouTube · ${f.ytId}</div>
+        <div class="fav-channel">${f.channel||''}</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:5px;">
-        <button class="icon-btn fav-btn on" onclick='toggleFavSearch(${JSON.stringify(f).replace(/'/g,"&#39;")})'>❤️</button>
-        <button class="icon-btn play-btn" onclick='playSong(${JSON.stringify(f).replace(/'/g,"&#39;")})'>▶</button>
+        <button class="icon-btn fav-btn on" onclick='toggleFav(${JSON.stringify(f)})'>❤️</button>
+        <button class="icon-btn play-btn" onclick='playSong(${JSON.stringify(f)})'>▶</button>
       </div>
     </div>`;
   }).join('');
 }
 
 function renderQueueFull() {
-  const el = document.getElementById('queue-full-list');
-  el.innerHTML = queue.length
-    ? queue.map((s,i)=>`<div class="queue-item">
+  const el=document.getElementById('queue-full-list');
+  el.innerHTML=queue.length
+    ?queue.map((s,i)=>`<div class="queue-item">
         <div class="q-num">${i+1}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-size:0.9rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.title||s.ytId}</div>
-          <div style="font-size:0.76rem;color:var(--text-dim);">YouTube · ${s.ytId}</div>
+          <div style="font-size:0.88rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.title||s.ytId}</div>
+          <div style="font-size:0.74rem;color:var(--text-dim);">${s.channel||''}</div>
         </div>
         <button class="icon-btn" style="background:rgba(200,0,0,0.15);color:#ff6666;" onclick="removeQueue(${i})">✕</button>
       </div>`).join('')
-    : '<div class="empty-state"><span class="empty-icon">🎶</span>點歌列表是空的<br>去搜尋歌曲並按 ➕ 加入！</div>';
+    :'<div class="empty-state"><span class="empty-icon">🎶</span>點歌列表是空的<br>搜尋歌曲後按 ➕ 加入！</div>';
 }
 
 function renderQueuePreview() {
-  const el = document.getElementById('queue-preview-area');
-  if (!queue.length) { el.innerHTML='<div style="color:var(--text-dim);font-size:0.85rem;text-align:center;padding:6px;">點歌列表是空的</div>'; return; }
-  el.innerHTML = queue.slice(0,3).map((s,i)=>`<div class="queue-item">
+  const el=document.getElementById('queue-preview-area');
+  if(!queue.length){ el.innerHTML='<div style="color:var(--text-dim);font-size:0.85rem;text-align:center;padding:6px;">點歌列表是空的</div>'; return; }
+  el.innerHTML=queue.slice(0,3).map((s,i)=>`<div class="queue-item">
     <div class="q-num">${i+1}</div>
-    <div style="flex:1;min-width:0;"><div style="font-size:0.88rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.title||s.ytId}</div></div>
-  </div>`).join('')+(queue.length>3?`<div style="text-align:center;color:var(--text-dim);font-size:0.82rem;padding:5px;">還有 ${queue.length-3} 首...</div>`:'');
+    <div style="flex:1;min-width:0;"><div style="font-size:0.86rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.title||s.ytId}</div></div>
+  </div>`).join('')+(queue.length>3?`<div style="text-align:center;color:var(--text-dim);font-size:0.8rem;padding:4px;">還有 ${queue.length-3} 首...</div>`:'');
 }
 
-/* ── Artist chips ── */
+/* ════════════════════════════════════
+   UI helpers
+════════════════════════════════════ */
 function renderArtistChips() {
-  document.getElementById('artist-chips').innerHTML = ARTISTS.map(a=>
+  document.getElementById('artist-chips').innerHTML=ARTISTS.map(a=>
     `<div class="artist-chip" onclick="searchArtist('${a}')">${a}</div>`).join('');
 }
 function searchArtist(a) {
   document.querySelectorAll('.artist-chip').forEach(c=>c.classList.toggle('active',c.textContent===a));
-  document.getElementById('search-input').value = a;
+  document.getElementById('search-input').value=a;
   doSearch();
 }
 
-/* ── Font size ── */
 function setSize(sz) {
   document.documentElement.style.setProperty('--lyric-size',sz);
-  document.querySelectorAll('.opt-btn').forEach((b,i)=>{
-    b.classList.toggle('active',['1.8rem','2.6rem','3.4rem','4.2rem'][i]===sz);
-  });
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>b.classList.toggle('active',['1.8rem','2.6rem','3.4rem','4.2rem'][i]===sz));
   if(currentSong&&currentSong.lyrics.length) renderLyricAt(lastLyricIdx<0?0:lastLyricIdx);
 }
 
-/* ── Tab switch ── */
 function switchTab(tab) {
   ['play','search','fav','queue'].forEach((t,i)=>{
     document.querySelectorAll('.nav-tab')[i].classList.toggle('active',t===tab);
@@ -769,16 +709,7 @@ function showToast(msg) {
   setTimeout(()=>t.classList.remove('show'),2200);
 }
 
-/* ── Input: Enter key ── */
-document.getElementById('search-input').addEventListener('keydown', e => {
-  if (e.key==='Enter') doSearch();
-});
-
-// Init
-renderArtistChips();
-renderFavList();
-renderQueueFull();
-renderQueuePreview();
+document.getElementById('search-input').addEventListener('keydown',e=>{ if(e.key==='Enter') doSearch(); });
 </script>
 </body>
 </html>
