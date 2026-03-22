@@ -516,10 +516,10 @@ function playSong(song) {
     document.getElementById('lyric-next').textContent='';
   }
 
-  if (!ytReady||!ytPlayer) { pendingPlay=song; return; }
+  if (!ytReady || !ytPlayer) { pendingPlay = song; switchTab('play'); showToast('⏳ 載入中，請稍候...'); return; }
   doLoad(song);
   switchTab('play');
-  showToast('🎵 '+( song.title||'播放中'));
+  showToast('🎵 ' + (song.title || '播放中'));
 }
 
 function doLoad(song) {
@@ -563,9 +563,20 @@ function manualNext() {
 }
 
 function togglePause() {
-  if(!currentSong||!ytPlayer){ showToast('請先選一首歌！'); return; }
-  const s=ytPlayer.getPlayerState();
-  if(s===YT.PlayerState.PLAYING) ytPlayer.pauseVideo(); else ytPlayer.playVideo();
+  if (!currentSong) { showToast('請先選一首歌！'); return; }
+  // ytPlayer 還沒初始化完成，先載入
+  if (!ytPlayer || !ytReady) { showToast('⏳ 播放器載入中，請稍候...'); return; }
+  const s = ytPlayer.getPlayerState();
+  if (s === YT.PlayerState.PLAYING) {
+    ytPlayer.pauseVideo();
+  } else if (s === YT.PlayerState.PAUSED || s === YT.PlayerState.CUED) {
+    ytPlayer.playVideo();
+  } else if (s === -1 || s === YT.PlayerState.UNSTARTED) {
+    // 尚未開始，重新載入
+    doLoad(currentSong);
+  } else {
+    ytPlayer.playVideo();
+  }
 }
 
 function stopSong() {
